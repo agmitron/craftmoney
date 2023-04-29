@@ -1,14 +1,35 @@
 import { test, expect } from "@jest/globals";
-import { $balance, $transactions, transactionAdded } from ".";
+import { $accounts, accountAdded, createAccount } from ".";
 
-test("The transaction is added and the balance is changed", () => {
-  expect($balance.getState()).toEqual(0);
-  expect($transactions.getState().length).toEqual(0);
+describe("Accounts", () => {
+  test("Create an account", () => {
+    expect($accounts.getState().length).toBe(0);
 
-  transactionAdded({ difference: -15, type: "Groceries" });
+    const account = createAccount("account1", "USD");
+    accountAdded(account);
 
-  expect($transactions.getState().length).toEqual(1);
-  expect($transactions.getState()[0].difference).toEqual(-15);
-  expect($transactions.getState()[0].type).toEqual("Groceries");
-  expect($balance.getState()).toEqual(-15);
+    expect($accounts.getState().length).toBe(1);
+  });
+
+  test("A transaction is pushed into a created account", () => {
+    expect($accounts.getState().length).toBe(1);
+
+    const account = createAccount("account2", "USD");
+    accountAdded(account);
+    expect($accounts.getState().length).toBe(2);
+
+    account.transactionAdded({ difference: 15, type: "Salary" });
+    expect(account.$balance.getState()).toBe(15);
+    expect($accounts.getState()[1].$balance.getState()).toBe(15);
+
+    account.transactionAdded({ difference: -15, type: "Food" });
+    expect(account.$balance.getState()).toBe(0);
+    expect($accounts.getState()[1].$balance.getState()).toBe(0);
+  });
+
+  test("The first account was not affected", () => {
+    expect($accounts.getState()[0].name).toBe("account1");
+    expect($accounts.getState()[0].$transactions.getState().length).toBe(0);
+    expect($accounts.getState()[1].$transactions.getState().length).toBe(2);
+  });
 });

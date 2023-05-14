@@ -1,72 +1,99 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform, SafeAreaView, StyleSheet, TextInput } from "react-native";
-
-import { Text, View } from "../components/Themed";
+import { SafeAreaView, StyleSheet, Vibration, View } from "react-native";
 import { useState } from "react";
-import { Picker } from "@react-native-picker/picker";
+import Typography from "../components/Typography";
+import * as Haptics from 'expo-haptics';
+import Input from "../components/Input";
+import { useTheme } from "../components/Themed";
+import Button from "../components/Button";
+import { Theme } from "../constants/theme";
 
+type TransactionType = "income" | "expense" | "transfer";
+
+// TODO: move to a separate component
 export default function Modal() {
-  const [choosenLabel, setChoosenLabel] = useState("Native");
-  const [choosenIndex, setChoosenIndex] = useState(2);
+  const [type, setType] = useState<TransactionType>("expense");
+  const theme = useTheme();
+  const styles = withTheme(theme);
+
+  const onTypeChange = (newType: TransactionType) => {
+    Haptics.selectionAsync()
+    setType(newType);
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add a transaction</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
       <SafeAreaView style={{ flex: 1 }}>
-        <Text>govno</Text>
-        <View style={styles.container}>
-          {/*Picker with multiple chose to choose*/}
-          {/*selectedValue to set the preselected value if any*/}
-          {/*onValueChange will help to handle the changes*/}
-          <Picker
-            selectedValue={choosenLabel}
-            onValueChange={(itemValue, itemIndex) => {
-              setChoosenLabel(itemValue);
-              setChoosenIndex(itemIndex);
+        <View style={styles.main}>
+          <Typography variant="title">Amount</Typography>
+          <Input
+            placeholder="100$"
+            decorations={{
+              left: (
+                <View style={styles.operation}>
+                  <Typography color={theme.colors.typography.secondary}>
+                    {type === "income" ? "+" : "-"}
+                  </Typography>
+                </View>
+              ),
             }}
-          >
-            <Picker.Item label="Hello" value="Hello" />
-            <Picker.Item label="React" value="React" />
-            <Picker.Item label="Native" value="Native" />
-            <Picker.Item label="How" value="How" />
-            <Picker.Item label="are" value="are" />
-            <Picker.Item label="you" value="you" />
-          </Picker>
-          {/*Text to show selected picker value*/}
-          <Text style={styles.text}>Selected Value: {choosenLabel}</Text>
-          {/*Text to show selected index */}
-          <Text style={styles.text}>Selected Index: {choosenIndex}</Text>
+            keyboardType="number-pad"
+            returnKeyType="done"
+            style={styles.input}
+          />
+          <View style={styles.types}>
+            <Button
+              variant={type === "transfer" ? "contained" : "outlined"}
+              onPress={() => onTypeChange("transfer")}
+              style={styles.type}
+            >
+              Transfer
+            </Button>
+            <Button
+              variant={type === "income" ? "contained" : "outlined"}
+              onPress={() => onTypeChange("income")}
+              style={styles.type}
+            >
+              Income
+            </Button>
+            <Button
+              variant={type === "expense" ? "contained" : "outlined"}
+              onPress={() => onTypeChange("expense")}
+              style={styles.type}
+            >
+              Expense
+            </Button>
+          </View>
         </View>
       </SafeAreaView>
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 20,
-  },
-  title: {
-    // fontSize: 20,
-    // fontWeight: "bold",
-  },
-  separator: {
-    // marginVertical: 20,
-    // height: 1,
-    // width: "80%",
-  },
-  text: {
-    // fontSize: 20,
-    // alignSelf: 'center',
-  },
-});
+const withTheme = (t: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+    },
+    operation: {
+      marginLeft: 23,
+    },
+    input: {
+      marginTop: 13,
+    },
+    types: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: 18,
+      columnGap: 4,
+    },
+    type: {
+      flex: 1,
+    },
+    main: {
+      backgroundColor: t.colors.background,
+      paddingHorizontal: 17,
+      paddingVertical: 28,
+    },
+  });

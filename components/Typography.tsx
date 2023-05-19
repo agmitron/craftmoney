@@ -1,11 +1,12 @@
 import { PropsWithChildren, useMemo } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleProp, StyleSheet, Text, TextStyle } from "react-native";
 import { useTheme } from "./Themed";
 
 interface Props {
   variant?: "title" | "subtitle" | "text";
   align?: "left" | "center" | "right";
   color?: string;
+  style?: StyleProp<TextStyle>;
 }
 
 const Typography: React.FC<PropsWithChildren<Props>> = ({
@@ -13,23 +14,25 @@ const Typography: React.FC<PropsWithChildren<Props>> = ({
   align = "left",
   color,
   children,
+  style,
 }) => {
   const theme = useTheme();
 
-  const style = useMemo(
+  const s = useMemo(
     () => ({
-      ...styles.common,
-      ...styles[variant],
+      ..._styles.common,
+      ..._styles[variant],
       color: color ?? theme.colors.typography.primary,
       textAlign: align,
+      ...(typeof style === "object" ? style : {}),
     }),
     []
   );
 
-  return <Text style={style}>{children}</Text>;
+  return <Text style={s}>{children}</Text>;
 };
 
-const styles = StyleSheet.create({
+const _styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",

@@ -1,11 +1,12 @@
-import { SafeAreaView, StyleSheet, Vibration, View } from "react-native";
+import { SafeAreaView, StyleSheet, View } from "react-native";
 import { useState } from "react";
 import Typography from "../components/Typography";
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 import Input from "../components/Input";
 import { useTheme } from "../components/Themed";
 import Button from "../components/Button";
 import { Theme } from "../constants/theme";
+import Select from "../components/Select";
 
 type TransactionType = "income" | "expense" | "transfer";
 
@@ -16,7 +17,7 @@ export default function Modal() {
   const styles = withTheme(theme);
 
   const onTypeChange = (newType: TransactionType) => {
-    Haptics.selectionAsync()
+    Haptics.selectionAsync();
     setType(newType);
   };
 
@@ -63,6 +64,11 @@ export default function Modal() {
               Expense
             </Button>
           </View>
+          <Select
+            title="Category"
+            description="Tap to select"
+            style={styles.select}
+          />
         </View>
       </SafeAreaView>
     </View>
@@ -95,5 +101,8 @@ const withTheme = (t: Theme) =>
       backgroundColor: t.colors.background,
       paddingHorizontal: 17,
       paddingVertical: 28,
+    },
+    select: {
+      marginTop: 38,
     },
   });

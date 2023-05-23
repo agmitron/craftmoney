@@ -1,29 +1,48 @@
-import { Pressable, Text, StyleSheet, PressableProps } from "react-native";
+import {
+  Pressable,
+  Text,
+  StyleSheet,
+  PressableProps,
+  ViewStyle,
+  StyleProp,
+} from "react-native";
 import { useTheme } from "./Themed";
 import { Theme } from "../constants/theme";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
+import { assertStyle } from "../utils/style";
 
 type Variant = "contained" | "outlined";
+type Size = "small" | "medium" | "large";
 
 interface Props extends PressableProps {
   variant?: Variant;
+  style?: StyleProp<ViewStyle>;
+  size?: Size;
 }
 
 const Button: React.FC<PropsWithChildren<Props>> = ({
   children,
   style,
   variant = "contained",
+  size = "small",
   ...props
 }) => {
+  const [isActive, setActive] = useState(false);
   const theme = useTheme();
-  const styles = withTheme(theme, variant);
+  const styles = withTheme(theme, variant, size);
+
+  const activeStyles = isActive ? styles._active : {}
 
   return (
     <Pressable
+      onPressIn={() => setActive(true)}
+      onPressOut={() => setActive(false)}
       style={{
         ...styles.common,
-        ...styles[variant],
-        ...(typeof style === "object" ? style : {}),
+        ...styles[`variant_${variant}`],
+        ...styles[`size_${size}`],
+        ...activeStyles,
+        ...assertStyle(style),
       }}
       {...props}
     >
@@ -32,14 +51,20 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
   );
 };
 
-const withTheme = (t: Theme, variant: Variant) =>
+const withTheme = (t: Theme, variant: Variant, size: Size) =>
   StyleSheet.create({
-    contained: {
+    variant_contained: {
       backgroundColor: t.colors.primary,
       borderRadius: t.borderRadius,
     },
-    outlined: {
+    variant_outlined: {
       borderRadius: t.borderRadius,
+    },
+    size_small: {},
+    size_medium: {},
+    size_large: {},
+    _active: {
+      opacity: 0.9
     },
     text: {
       color:
@@ -47,7 +72,7 @@ const withTheme = (t: Theme, variant: Variant) =>
           ? t.colors.typography.inverted
           : t.colors.primary,
       textAlign: "center",
-      fontSize: 16,
+      fontSize: size === "large" ? 20 : 16,
     },
     common: {
       paddingVertical: 10,

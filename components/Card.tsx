@@ -1,10 +1,15 @@
 import { PropsWithChildren } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { assertStyle } from "../utils/style";
 
-interface Props {}
+interface Props {
+  style?: StyleProp<ViewStyle>;
+}
 
-const Card: React.FC<PropsWithChildren<Props>> = ({ children }) => {
-  return <View style={styles.root}>{children}</View>;
+const Card: React.FC<PropsWithChildren<Props>> = ({ children, style }) => {
+  return (
+    <View style={{ ...styles.root, ...assertStyle(style) }}>{children}</View>
+  );
 };
 
 const styles = StyleSheet.create({

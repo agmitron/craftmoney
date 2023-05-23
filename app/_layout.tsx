@@ -52,7 +52,7 @@ function RootLayoutNav() {
             name="modal"
             options={{
               presentation: "modal",
-              header: Modal.Header,
+              header: Modal.Header
             }}
           />
         </Stack>

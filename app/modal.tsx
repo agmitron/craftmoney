@@ -20,7 +20,7 @@ import Card from "../components/Card";
 type TransactionType = "income" | "expense" | "transfer";
 
 interface Action {
-  render: () => React.ReactElement;
+  render: (key: string | number) => React.ReactElement;
 }
 
 // TODO: move to a separate component
@@ -39,16 +39,17 @@ export default function Modal() {
 
   const additionalActions: Action[] = [
     {
-      render: () => (
-        <View style={styles["additional__list-item"]}>
+      render: (key) => (
+        <View key={key} style={styles["additional__list-item"]}>
           <Typography>Date</Typography>
         </View>
       ),
     },
     {
-      render: () => {
+      render: (key) => {
         return (
           <View
+            key={key}
             style={[
               styles["additional__list-item"],
               styles["additional__list-item_last"],
@@ -140,7 +141,7 @@ export default function Modal() {
               Additional
             </Typography>
             <Card style={styles.card}>
-              {additionalActions.map((a) => a.render())}
+              {additionalActions.map((a, i) => a.render(i))}
             </Card>
           </View>
         </ScrollView>

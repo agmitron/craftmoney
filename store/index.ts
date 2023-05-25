@@ -1,53 +1,54 @@
-import { Event, Store, createEvent, createStore, sample } from "effector";
+import {
+  Event,
+  Store,
+  combine,
+  createEvent,
+  createStore,
+  sample,
+} from "effector";
 
 type AccountID = string;
 
 interface Transaction {
   difference: number;
   type: string;
+  account: AccountID;
 }
 
 interface Account {
   id: AccountID;
   currency: string;
   name: string;
-  $balance: Store<number>;
-  $transactions: Store<Transaction[]>;
-  transactionAdded: Event<Transaction>;
 }
 
+type Transactions = Record<AccountID, Transaction[]>;
+type Balances = Record<AccountID, number>;
+
 export const $accounts = createStore<Account[]>([]);
+export const $transactions = createStore<Transactions>({});
+export const $balances = $transactions.map((transactions) =>
+  Object.fromEntries(
+    Object.entries(transactions).map(([account, transactions = []]) => {
+      return [
+        account,
+        transactions.reduce((sum, { difference }) => sum + difference, 0),
+      ];
+    })
+  )
+);
+
 export const accountAdded = createEvent<Account>();
+export const transactionAdded = createEvent<Transaction>();
 
-export const createAccount = (name: string, currency: string): Account => {
-  const id = `${Math.random() * 100}`;
-
-  const $transactions = createStore<Transaction[]>([]);
-  const $balance = createStore<number>(0);
-
-  const transactionAdded = createEvent<Transaction>();
-
-  sample({
-    clock: transactionAdded,
-    source: $balance,
-    fn: (balance, { difference }) => balance + difference,
-    target: $balance,
-  });
-
-  sample({
-    clock: transactionAdded,
-    source: $transactions,
-    fn: (state, transaction) => [...state, transaction],
-    target: $transactions,
-  });
-
+export const createAccount = (
+  id: string,
+  name: string,
+  currency: string
+): Account => {
   return {
     id,
     currency,
     name,
-    $balance,
-    $transactions,
-    transactionAdded,
   };
 };
 
@@ -56,4 +57,17 @@ sample({
   source: $accounts,
   fn: (accounts, newAccount) => [...accounts, newAccount],
   target: $accounts,
+});
+
+sample({
+  clock: transactionAdded,
+  source: $transactions,
+  fn: (transactions, tx) => {
+    const prevTransactions = transactions[tx.account] ?? [];
+    return {
+      ...transactions,
+      [tx.account]: [...prevTransactions, tx],
+    };
+  },
+  target: $transactions,
 });

@@ -1,14 +1,16 @@
 import { FlatList, StyleSheet, View } from "react-native";
 import { useStore, useStoreMap } from "effector-react";
 import Typography from "~/components/Typography";
+import Card from "~/components/Card";
 import {
   $accounts,
-  $balances,
   $transactions,
   accountAdded,
   createAccount,
   transactionAdded,
 } from "~/store/index";
+import Accounts from "~/components/Accounts";
+import List from "~/components/List";
 
 // TODO: remove
 const testAccount1 = createAccount("0", "THB", "THB");
@@ -75,54 +77,59 @@ export default function TabOneScreen() {
     )
   );
   const accounts = useStore($accounts);
-  const balances = useStore($balances);
 
   return (
-    <View style={styles.container}>
-      <Typography variant="title">Accounts</Typography>
-      <FlatList
-        data={accounts}
-        renderItem={({ item: { id, name, currency } }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              columnGap: 50,
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography>Name: {name}</Typography>
-            <Typography>Currency: {currency}</Typography>
-            <Typography>Balance: {balances[id]}</Typography>
-          </View>
-        )}
-      />
-
-      <Typography variant="title">Transactions</Typography>
-      <FlatList
-        data={transactions}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              columnGap: 50,
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography>Type: {item.type}</Typography>
-            <Typography>Difference: {item.difference}</Typography>
-            <Typography>Account: {item.account}</Typography>
-          </View>
-        )}
-      />
+    <View style={styles.root}>
+      <Accounts />
+      <Card style={{ flex: 1, width: "100%" }}>
+        <Typography variant="title">Transactions</Typography>
+        <FlatList
+          data={transactions}
+          renderItem={({ item }) => (
+            <List.Item
+              // TODO: refactor
+              style={{
+                flexDirection: "row",
+                columnGap: 50,
+                justifyContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "column",
+                  rowGap: 5,
+                  justifyContent: "center",
+                }}
+              >
+                <Typography variant="subtitle">{item.type}</Typography>
+                <Typography>{accounts[item.account].name}</Typography>
+              </View>
+              <Typography
+                style={{
+                  alignItems: "center",
+                  display: "flex",
+                  flexDirection: "row",
+                }}
+              >
+                {item.difference} {accounts[item.account].currency}
+              </Typography>
+            </List.Item>
+          )}
+        />
+      </Card>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  root: {
     alignItems: "center",
+    alignContent: "space-between",
     justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    rowGap: 20,
+    flex: 1,
   },
   title: {
     fontSize: 20,

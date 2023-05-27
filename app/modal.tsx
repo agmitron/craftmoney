@@ -16,6 +16,7 @@ import Button from "../components/Button";
 import { Theme } from "../constants/theme";
 import Select from "../components/Select";
 import Card from "../components/Card";
+import List from "~/components/List";
 
 type TransactionType = "income" | "expense" | "transfer";
 
@@ -40,21 +41,15 @@ export default function Modal() {
   const additionalActions: Action[] = [
     {
       render: (key) => (
-        <View key={key} style={styles["additional__list-item"]}>
+        <List.Item key={key}>
           <Typography>Date</Typography>
-        </View>
+        </List.Item>
       ),
     },
     {
       render: (key) => {
         return (
-          <View
-            key={key}
-            style={[
-              styles["additional__list-item"],
-              styles["additional__list-item_last"],
-            ]}
-          >
+          <List.Item key={key} last>
             <TextField
               placeholder="Note"
               variant="plain"
@@ -62,7 +57,7 @@ export default function Modal() {
               returnKeyLabel="done"
               returnKeyType="done"
             />
-          </View>
+          </List.Item>
         );
       },
     },
@@ -196,13 +191,5 @@ const withTheme = (t: Theme) =>
     card: {
       paddingVertical: 0,
       paddingHorizontal: 15,
-    },
-    "additional__list-item": {
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: t.colors.surface,
-    },
-    "additional__list-item_last": {
-      borderBottomWidth: 0,
     },
   });

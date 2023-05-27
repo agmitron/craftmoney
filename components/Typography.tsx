@@ -37,11 +37,13 @@ const _styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  subtitle: {},
-  text: {
+  subtitle: {
+    fontWeight: "bold",
+  },
+  text: {},
+  common: {
     fontSize: 17,
   },
-  common: {},
 });
 
 export default Typography;

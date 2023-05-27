@@ -1,11 +1,4 @@
-import {
-  Event,
-  Store,
-  combine,
-  createEvent,
-  createStore,
-  sample,
-} from "effector";
+import { createEvent, createStore, sample } from "effector";
 
 type AccountID = string;
 
@@ -23,8 +16,9 @@ interface Account {
 
 type Transactions = Record<AccountID, Transaction[]>;
 type Balances = Record<AccountID, number>;
+type Accounts = Record<AccountID, Account>;
 
-export const $accounts = createStore<Account[]>([]);
+export const $accounts = createStore<Accounts>({});
 export const $transactions = createStore<Transactions>({});
 export const $balances = $transactions.map((transactions) =>
   Object.fromEntries(
@@ -55,7 +49,7 @@ export const createAccount = (
 sample({
   clock: accountAdded,
   source: $accounts,
-  fn: (accounts, newAccount) => [...accounts, newAccount],
+  fn: (accounts, newAccount) => ({ ...accounts, [newAccount.id]: newAccount }),
   target: $accounts,
 });
 

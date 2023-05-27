@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Card from "./Card";
 import Typography from "./Typography";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { useStore } from "effector-react";
 import { $accounts, $balances } from "~/store";
 import { Theme } from "~/constants/theme";
@@ -17,6 +17,8 @@ const Accounts: React.FC<Props> = () => {
 
   const accounts = useStore($accounts);
   const balances = useStore($balances);
+
+  console.log({ balances });
 
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -60,9 +62,7 @@ const Accounts: React.FC<Props> = () => {
     }
   }
 
-  return <Card style={{ ...styles.root, ...styles.root_list }}>
-    {content}
-  </Card>;
+  return <Card style={{ ...styles.root, ...styles.root_list }}>{content}</Card>;
 };
 
 const withTheme = (t: Theme) =>

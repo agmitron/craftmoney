@@ -7,7 +7,6 @@ import {
   $transactions,
   accountAdded,
   createAccount,
-  transactionAdded,
 } from "~/store/index";
 import Accounts from "~/components/Accounts";
 import List from "~/components/List";
@@ -21,60 +20,14 @@ accountAdded(testAccount1);
 accountAdded(testAccount2);
 accountAdded(testAccount3);
 
-transactionAdded({
-  difference: -100,
-  type: "Public transport",
-  account: testAccount1.id,
-});
-transactionAdded({
-  difference: -150,
-  type: "Groceries",
-  account: testAccount1.id,
-});
-transactionAdded({
-  difference: -50,
-  type: "Restaurants",
-  account: testAccount1.id,
-});
-
-transactionAdded({
-  difference: -2000,
-  type: "Maintainance, repairs",
-  account: testAccount2.id,
-});
-transactionAdded({
-  difference: -2600,
-  type: "Taxes",
-  account: testAccount2.id,
-});
-transactionAdded({
-  difference: +4800,
-  type: "Wage, invoices",
-  account: testAccount2.id,
-});
-
-transactionAdded({
-  difference: -25,
-  type: "Restaurants",
-  account: testAccount3.id,
-});
-transactionAdded({
-  difference: -30,
-  type: "Investments",
-  account: testAccount3.id,
-});
-transactionAdded({
-  difference: -17,
-  type: "Restaurants",
-  account: testAccount3.id,
-});
-
 export default function TabOneScreen() {
   const transactions = useStoreMap($transactions, (transactions) =>
-    Object.values(transactions).reduce(
-      (accumulator, transactions) => [...accumulator, ...transactions],
-      []
-    )
+    Object.values(transactions)
+      .reduce(
+        (accumulator, transactions) => [...accumulator, ...transactions],
+        []
+      )
+      .reverse()
   );
   const accounts = useStore($accounts);
 
@@ -92,6 +45,7 @@ export default function TabOneScreen() {
                 flexDirection: "row",
                 columnGap: 50,
                 justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
               <View
@@ -101,7 +55,7 @@ export default function TabOneScreen() {
                   justifyContent: "center",
                 }}
               >
-                <Typography variant="subtitle">{item.type}</Typography>
+                <Typography variant="subtitle">{item.category}</Typography>
                 <Typography>{accounts[item.account].name}</Typography>
               </View>
               <Typography
@@ -111,7 +65,8 @@ export default function TabOneScreen() {
                   flexDirection: "row",
                 }}
               >
-                {item.difference} {accounts[item.account].currency}
+                {item.difference < 0 ? "-" : "+"}
+                {Math.abs(item.difference)} {accounts[item.account].currency}
               </Typography>
             </List.Item>
           )}

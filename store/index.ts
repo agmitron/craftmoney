@@ -1,10 +1,19 @@
 import { createEvent, createStore, sample } from "effector";
+import {
+  $account,
+  $additional,
+  $amount,
+  $category,
+  $type,
+  addButtonPressed,
+} from "./form";
 
 type AccountID = string;
+type Additional = Record<string, string>;
 
 interface Transaction {
   difference: number;
-  type: string;
+  category: string;
   account: AccountID;
 }
 
@@ -54,6 +63,16 @@ sample({
 });
 
 sample({
+  clock: accountAdded,
+  fn: (account) => ({
+    difference: 0,
+    category: "Account creation",
+    account: account.id,
+  }),
+  target: transactionAdded,
+});
+
+sample({
   clock: transactionAdded,
   source: $transactions,
   fn: (transactions, tx) => {
@@ -64,4 +83,28 @@ sample({
     };
   },
   target: $transactions,
+});
+
+sample({
+  clock: addButtonPressed,
+  source: {
+    amount: $amount,
+    category: $category,
+    type: $type,
+    additional: $additional,
+    account: $account,
+  },
+  fn: ({ additional, amount, category, type, account }) => {
+    const difference = type === "income" ? +amount : +amount * -1;
+
+    console.log({ difference, amount });
+
+    return {
+      difference,
+      category,
+      additional,
+      account,
+    };
+  },
+  target: transactionAdded,
 });

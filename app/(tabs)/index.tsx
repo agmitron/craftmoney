@@ -5,31 +5,22 @@ import Card from "~/components/Card";
 import {
   $accounts,
   $transactions,
-  accountAdded,
-  createAccount,
 } from "~/store/index";
 import Accounts from "~/components/Accounts";
 import List from "~/components/List";
 
-// TODO: remove
-const testAccount1 = createAccount("0", "THB", "THB");
-const testAccount2 = createAccount("1", "IDR", "IDR");
-const testAccount3 = createAccount("2", "USD", "USD");
-
-accountAdded(testAccount1);
-accountAdded(testAccount2);
-accountAdded(testAccount3);
-
 export default function TabOneScreen() {
-  const transactions = useStoreMap($transactions, (transactions) =>
+  const _transactions = useStoreMap($transactions, (transactions) =>
     Object.values(transactions)
       .reduce(
         (accumulator, transactions) => [...accumulator, ...transactions],
         []
       )
       .reverse()
+      .filter(({ category }) => category !== "Account creation")
   );
-  const accounts = useStore($accounts);
+
+  const _accounts = useStore($accounts);
 
   return (
     <View style={styles.root}>
@@ -37,7 +28,7 @@ export default function TabOneScreen() {
       <Card style={{ flex: 1, width: "100%" }}>
         <Typography variant="title">Transactions</Typography>
         <FlatList
-          data={transactions}
+          data={_transactions}
           renderItem={({ item }) => (
             <List.Item
               // TODO: refactor
@@ -56,7 +47,7 @@ export default function TabOneScreen() {
                 }}
               >
                 <Typography variant="subtitle">{item.category}</Typography>
-                <Typography>{accounts[item.account].name}</Typography>
+                <Typography>{_accounts[item.account]?.name}</Typography>
               </View>
               <Typography
                 style={{
@@ -66,7 +57,7 @@ export default function TabOneScreen() {
                 }}
               >
                 {item.difference < 0 ? "-" : "+"}
-                {Math.abs(item.difference)} {accounts[item.account].currency}
+                {Math.abs(item.difference)} {_accounts[item.account]?.currency}
               </Typography>
             </List.Item>
           )}

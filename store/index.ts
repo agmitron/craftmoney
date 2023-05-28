@@ -1,15 +1,8 @@
 import { createEvent, createStore, sample } from "effector";
-import {
-  $account,
-  $additional,
-  $amount,
-  $category,
-  $type,
-  addButtonPressed,
-} from "./form";
+import { persist } from "@effector-storage/react-native-async-storage";
+import * as form from "./form";
 
 type AccountID = string;
-type Additional = Record<string, string>;
 
 interface Transaction {
   difference: number;
@@ -29,7 +22,11 @@ type Accounts = Record<AccountID, Account>;
 
 export const $accounts = createStore<Accounts>({});
 export const $transactions = createStore<Transactions>({});
-export const $balances = $transactions.map((transactions) =>
+
+persist({ store: $accounts });
+persist({ store: $transactions });
+
+export const $balances = $transactions.map<Balances>((transactions) =>
   Object.fromEntries(
     Object.entries(transactions).map(([account, transactions = []]) => {
       return [
@@ -86,18 +83,16 @@ sample({
 });
 
 sample({
-  clock: addButtonPressed,
+  clock: form.addButtonPressed,
   source: {
-    amount: $amount,
-    category: $category,
-    type: $type,
-    additional: $additional,
-    account: $account,
+    amount: form.$amount,
+    category: form.$category,
+    type: form.$type,
+    additional: form.$additional,
+    account: form.$account,
   },
   fn: ({ additional, amount, category, type, account }) => {
     const difference = type === "income" ? +amount : +amount * -1;
-
-    console.log({ difference, amount });
 
     return {
       difference,
@@ -108,3 +103,12 @@ sample({
   },
   target: transactionAdded,
 });
+
+// TODO: remove
+const testAccount1 = createAccount("0", "THB", "THB");
+const testAccount2 = createAccount("1", "IDR", "IDR");
+const testAccount3 = createAccount("2", "USD", "USD");
+
+accountAdded(testAccount1);
+accountAdded(testAccount2);
+accountAdded(testAccount3);

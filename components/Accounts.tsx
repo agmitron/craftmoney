@@ -15,10 +15,8 @@ interface Props {}
 const Accounts: React.FC<Props> = () => {
   const [variant, setVariant] = useState<Variant>("list");
 
-  const accounts = useStore($accounts);
-  const balances = useStore($balances);
-
-  console.log({ balances });
+  const _accounts = useStore($accounts);
+  const _balances = useStore($balances);
 
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -41,7 +39,7 @@ const Accounts: React.FC<Props> = () => {
         <>
           <Typography variant="title">Accounts</Typography>
           <FlatList
-            data={Object.values(accounts)}
+            data={Object.values(_accounts)}
             renderItem={({ item: { id, name, currency } }) => (
               <List.Item
                 style={{
@@ -52,7 +50,7 @@ const Accounts: React.FC<Props> = () => {
               >
                 <Typography variant="subtitle">{name}</Typography>
                 <Typography>
-                  {balances[id]} {currency}
+                  {_balances[id]} {currency}
                 </Typography>
               </List.Item>
             )}

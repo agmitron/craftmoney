@@ -1,1 +1,4 @@
-import './app/_layout'
+import { registerRootComponent } from 'expo'
+import Layout from './app/_layout'
+
+registerRootComponent(Layout)

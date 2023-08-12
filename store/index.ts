@@ -16,7 +16,7 @@ interface Account {
   transactionAdded: Event<Transaction>;
 }
 
-type Categories = {
+export type Categories = {
   [name: string]: Categories | null;
 };
 
@@ -27,16 +27,16 @@ export const $categories = createStore<Categories>({
       kfc: null,
       mcdonalds: null,
     },
-    investments: {
-      crypto: {
-        altcoins: null,
-        web3: null,
-        gamefi: null,
-      },
-      stocks: {
-        snp500: null,
-        etf: null,
-      }
+  },
+  investments: {
+    crypto: {
+      altcoins: null,
+      web3: null,
+      gamefi: null,
+    },
+    stocks: {
+      snp500: null,
+      etf: null,
     }
   }
 });

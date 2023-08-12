@@ -18,9 +18,16 @@ interface Props {
   description?: string;
   style?: StyleProp<ViewStyle>;
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
+  emoji?: string;
 }
 
-const Select: React.FC<Props> = ({ title, description, style, onPress }) => {
+const Select: React.FC<Props> = ({
+  title,
+  description,
+  style,
+  onPress,
+  emoji,
+}) => {
   const [isActive, setActive] = useState(false);
   const scaleAnimation = useRef(new Animated.Value(1)).current;
   const theme = useTheme();
@@ -57,7 +64,7 @@ const Select: React.FC<Props> = ({ title, description, style, onPress }) => {
       onPress={onPress}
     >
       <Animated.View style={[styles.root, assertStyle(style), animatedStyles]}>
-        <Typography style={styles.icon}>🙏</Typography>
+        <Typography style={styles.icon}>{emoji}</Typography>
 
         <View>
           <Typography variant="title" style={styles.title}>

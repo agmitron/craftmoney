@@ -8,7 +8,7 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View, useColorScheme } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TabOneScreen from "./(tabs)";
@@ -18,6 +18,9 @@ import { Header as ModalHeader } from "../components/Modal";
 import { Theme } from "../constants/theme";
 import { useTheme } from "../components/Themed";
 import Categories from "./categories";
+import { $categories } from "../store";
+import { useStoreMap } from "effector-react";
+import { flattenCategories } from "../utils/categories";
 
 export const Stack = createNativeStackNavigator();
 
@@ -29,18 +32,6 @@ export enum Screens {
 }
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
-
-const linking = {
-  config: {
-    screens: {
-      [Screens.Home]: "/",
-      [Screens.Modal]: "/modal",
-      [Screens.Second]: "two",
-      [Screens.Categories]: "categories",
-    },
-  },
-  prefixes: [],
-};
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -98,12 +89,40 @@ function withTabs<T>(
   };
 }
 
+const useLinking = (categoriesScreens: string[] = []) => {
+  const linking = useMemo(() => {
+    const result = {
+      config: {
+        screens: {
+          [Screens.Home as string]: "/",
+          [Screens.Modal as string]: "/modal",
+          [Screens.Second as string]: "two",
+          [Screens.Categories as string]: "categories",
+        },
+      },
+      prefixes: [],
+    };
+
+    for (const cs of categoriesScreens) {
+      result.config.screens[`categories/${cs}`] = `categories/${cs}`;
+    }
+
+    return result;
+  }, []);
+
+  return linking;
+};
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const theme = useTheme();
   const styles = withTheme(theme);
 
-  console.log('RootLayoutNav')
+  const categoriesScreens = useStoreMap($categories, (categories) =>
+    Object.keys(flattenCategories(categories, "", {}, "/"))
+  );
+
+  const linking = useLinking(categoriesScreens);
 
   return (
     <NavigationContainer linking={linking}>
@@ -138,6 +157,9 @@ function RootLayoutNav() {
               // }}
               component={Categories}
             />
+            {categoriesScreens.map((cs) => (
+              <Stack.Screen name={`categories/${cs}`} component={Categories} />
+            ))}
           </Stack.Navigator>
         </ThemeProvider>
       </View>

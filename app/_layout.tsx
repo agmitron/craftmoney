@@ -5,32 +5,39 @@ import {
   Link,
   NavigationContainer,
   ThemeProvider,
+  useRoute,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  useColorScheme,
-} from "react-native";
+import { StyleSheet, Text, View, useColorScheme } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TabOneScreen from "./(tabs)";
 import TabTwoScreen from "./(tabs)/two";
 import Modal from "./modal";
 import { Header as ModalHeader } from "../components/Modal";
-import TabLayout from "./(tabs)/_layout";
+import { Theme } from "../constants/theme";
+import { useTheme } from "../components/Themed";
 
 export const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator()
 
 enum Screens {
   Home = "Home",
   Second = "Second",
   Modal = "Modal",
 }
+
+const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
+
+const linking = {
+  config: {
+    screens: {
+      [Screens.Home]: "/",
+      [Screens.Modal]: "/modal",
+      [Screens.Second]: "two",
+    },
+  },
+  prefixes: [],
+};
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -52,80 +59,110 @@ export default function RootLayout() {
   );
 }
 
-const linking = {
-  config: {
-    screens: {
-      [Screens.Home]: "/",
-      [Screens.Modal]: "/modal",
-      [Screens.Second]: "two",
-    },
-  },
-  prefixes: ["http"],
+export const Tabs = () => {
+  const theme = useTheme();
+  const styles = withTheme(theme);
+  const route = useRoute();
+
+  return (
+    <View style={styles.navbar}>
+      <Link
+        to={{ screen: Screens.Second }}
+        style={[styles.navbar__button, styles.navbar__button_bordered]}
+      >
+        <Text>Two</Text>
+      </Link>
+      <Link to={{ screen: Screens.Home }} style={styles.navbar__button}>
+        <Text>Home</Text>
+      </Link>
+    </View>
+  );
 };
+
+function withTabs<T>(
+  Component: () => React.ReactElement
+): (props: T) => React.ReactElement {
+  const theme = useTheme();
+  const styles = withTheme(theme);
+
+  return (_: T) => {
+    const route = useRoute();
+    return (
+      <View style={styles.root}>
+        <Component />
+        {screensWithTabs.has(route.name) && <Tabs />}
+      </View>
+    );
+  };
+}
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const theme = useTheme();
+  const styles = withTheme(theme);
 
   return (
     <NavigationContainer linking={linking}>
       <View style={styles.root}>
-        {/* <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}> */}
-        <Stack.Navigator>
-          <Stack.Screen
-            name={Screens.Home}
-            // options={{ headerShown: false }}
-            component={TabOneScreen}
-          />
-          <Stack.Screen
-            name={Screens.Second}
-            // options={{ headerShown: false }}
-            component={TabTwoScreen}
-          />
-          <Stack.Screen
-            name={Screens.Modal}
-            options={{
-              presentation: "modal",
-              header: ModalHeader,
-            }}
-            component={Modal}
-          />
-        </Stack.Navigator>
-
-        <View style={styles.navbar}>
-          <Link to={{ screen: Screens.Second }} style={styles.navbar__button}>
-            <Text>Two</Text>
-          </Link>
-          <Link to={{ screen: Screens.Home }} style={styles.navbar__button}>
-            <Text>Home</Text>
-          </Link>
-        </View>
-        {/* </ThemeProvider> */}
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack.Navigator>
+            <Stack.Screen
+              name={Screens.Home}
+              // options={{ headerShown: false }}
+              component={withTabs(TabOneScreen)}
+            />
+            <Stack.Screen
+              name={Screens.Second}
+              // options={{ headerShown: false }}
+              component={withTabs(TabTwoScreen)}
+            />
+            <Stack.Screen
+              name={Screens.Modal}
+              options={{
+                presentation: "modal",
+                header: ModalHeader,
+              }}
+              component={Modal}
+            />
+          </Stack.Navigator>
+        </ThemeProvider>
       </View>
     </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    width: "100%",
-    height: "100%",
-  },
-  navbar: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 50,
-    width: "100%",
-  },
-  navbar__button: {
-    display: "flex",
-    flexDirection: "column",
-    width: "50%",
-    textAlign: "center",
-    textAlignVertical: "center",
-  },
-});
+const withTheme = (t: Theme) =>
+  StyleSheet.create({
+    root: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      width: "100%",
+      height: "100%",
+    },
+    navbar: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 50,
+      width: "100%",
+      backgroundColor: "white",
+    },
+    navbar__button: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "50%",
+      height: "100%",
+      textAlign: "center",
+      textAlignVertical: "center",
+    },
+    navbar__button_bordered: {
+      borderRightWidth: 1,
+      borderRightColor: t.colors.surface,
+    },
+  });

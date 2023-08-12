@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import { useStore } from "effector-react";
+// import { useStore } from "effector-react";
 import Typography from "./Typography";
 import { useTheme } from "./Themed";
 import { Theme } from "../constants/theme";
@@ -13,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({ text }) => {
   const theme = useTheme();
   const styles = withTheme(theme);
 
-  const categories = useStore($categories)
+  // const categories = useStore($categories)
 
   return (
     <View style={styles.root}>

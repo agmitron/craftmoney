@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 import Card from "../components/Card";
+import _ from "lodash";
 import { $categories } from "../store";
 import Select from "../components/Select";
 import { useNavigation } from "@react-navigation/native";
@@ -11,9 +12,9 @@ const Categories: React.FC = () => {
 
   return (
     <View>
-      {Object.keys(categories).map((c) => (
+      {/* {Object.keys(categories).map((c) => (
         <Select title={c} onPress={() => navigation.navigate(c as never)} />
-      ))}
+      ))} */}
     </View>
   );
 };

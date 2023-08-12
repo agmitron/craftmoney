@@ -103,6 +103,8 @@ function RootLayoutNav() {
   const theme = useTheme();
   const styles = withTheme(theme);
 
+  console.log('RootLayoutNav')
+
   return (
     <NavigationContainer linking={linking}>
       <View style={styles.root}>
@@ -130,10 +132,10 @@ function RootLayoutNav() {
             />
             <Stack.Screen
               name={Screens.Categories}
-              options={{
-                presentation: "modal",
-                header: () => <ModalHeader text="Select a category" />,
-              }}
+              // options={{
+              //   presentation: "modal",
+              //   header: () => <ModalHeader text="Select a category" />,
+              // }}
               component={Categories}
             />
           </Stack.Navigator>

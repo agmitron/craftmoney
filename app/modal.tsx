@@ -135,7 +135,7 @@ export default function Modal() {
               description="Tap to select"
               style={styles.select}
               onPress={() =>
-                navigation.navigate(Screens.Home as never) // TODO: ????
+                navigation.navigate(Screens.Categories as never) // TODO: ????
               }
             />
           </View>

@@ -1,18 +1,24 @@
 import { View, StyleSheet } from "react-native";
+import { useStore } from "effector-react";
 import Typography from "./Typography";
 import { useTheme } from "./Themed";
 import { Theme } from "../constants/theme";
+import { $categories } from '../store';
 
-interface HeaderProps {}
+interface HeaderProps {
+  text: string;
+}
 
-export const Header: React.FC<HeaderProps> = () => {
+export const Header: React.FC<HeaderProps> = ({ text }) => {
   const theme = useTheme();
   const styles = withTheme(theme);
+
+  const categories = useStore($categories)
 
   return (
     <View style={styles.root}>
       <Typography color={theme.colors.typography.primary} align="center">
-        Add operation
+        {text}
       </Typography>
     </View>
   );

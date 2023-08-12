@@ -1,4 +1,6 @@
-import { registerRootComponent } from 'expo'
-import Layout from './app/_layout'
+import { registerRootComponent } from "expo";
+import App from "./app/index";
 
-registerRootComponent(Layout)
+console.log(App);
+
+registerRootComponent(App);

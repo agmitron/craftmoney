@@ -17,13 +17,15 @@ import Modal from "./modal";
 import { Header as ModalHeader } from "../components/Modal";
 import { Theme } from "../constants/theme";
 import { useTheme } from "../components/Themed";
+import Categories from "./categories";
 
 export const Stack = createNativeStackNavigator();
 
-enum Screens {
+export enum Screens {
   Home = "Home",
   Second = "Second",
   Modal = "Modal",
+  Categories = "Categories",
 }
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
@@ -34,6 +36,7 @@ const linking = {
       [Screens.Home]: "/",
       [Screens.Modal]: "/modal",
       [Screens.Second]: "two",
+      [Screens.Categories]: "categories",
     },
   },
   prefixes: [],
@@ -62,7 +65,6 @@ export default function RootLayout() {
 export const Tabs = () => {
   const theme = useTheme();
   const styles = withTheme(theme);
-  const route = useRoute();
 
   return (
     <View style={styles.navbar}>
@@ -122,9 +124,17 @@ function RootLayoutNav() {
               name={Screens.Modal}
               options={{
                 presentation: "modal",
-                header: ModalHeader,
+                header: () => <ModalHeader text="Add operation" />,
               }}
               component={Modal}
+            />
+            <Stack.Screen
+              name={Screens.Categories}
+              options={{
+                presentation: "modal",
+                header: () => <ModalHeader text="Select a category" />,
+              }}
+              component={Categories}
             />
           </Stack.Navigator>
         </ThemeProvider>

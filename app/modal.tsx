@@ -16,6 +16,8 @@ import Button from "../components/Button";
 import { Theme } from "../constants/theme";
 import Select from "../components/Select";
 import Card from "../components/Card";
+import { useNavigation } from "@react-navigation/native";
+import { Screens } from "./_layout";
 
 type TransactionType = "income" | "expense" | "transfer";
 
@@ -29,6 +31,7 @@ export default function Modal() {
   const [isButtonHidden, setButtonHidden] = useState(false);
   const theme = useTheme();
   const styles = withTheme(theme);
+  const navigation = useNavigation();
 
   const onTypeChange = (newType: TransactionType) => {
     if (Platform.OS !== "web") {
@@ -131,6 +134,9 @@ export default function Modal() {
               title="Category"
               description="Tap to select"
               style={styles.select}
+              onPress={() =>
+                navigation.navigate(Screens.Home as never) // TODO: ????
+              }
             />
           </View>
           <View style={styles.additional}>

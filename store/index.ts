@@ -16,7 +16,30 @@ interface Account {
   transactionAdded: Event<Transaction>;
 }
 
+type Categories = {
+  [name: string]: Categories | null;
+};
+
 export const $accounts = createStore<Account[]>([]);
+export const $categories = createStore<Categories>({
+  food: {
+    restaurants: {
+      kfc: null,
+      mcdonalds: null,
+    },
+    investments: {
+      crypto: {
+        altcoins: null,
+        web3: null,
+        gamefi: null,
+      },
+      stocks: {
+        snp500: null,
+        etf: null,
+      }
+    }
+  }
+});
 export const accountAdded = createEvent<Account>();
 
 export const createAccount = (name: string, currency: string): Account => {

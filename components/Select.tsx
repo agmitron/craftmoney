@@ -5,6 +5,7 @@ import {
   ViewStyle,
   Pressable,
   Animated,
+  GestureResponderEvent,
 } from "react-native";
 import { Theme } from "../constants/theme";
 import Typography from "./Typography";
@@ -14,11 +15,12 @@ import { useEffect, useRef, useState } from "react";
 
 interface Props {
   title: string;
-  description: string;
+  description?: string;
   style?: StyleProp<ViewStyle>;
+  onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
 }
 
-const Select: React.FC<Props> = ({ title, description, style }) => {
+const Select: React.FC<Props> = ({ title, description, style, onPress }) => {
   const [isActive, setActive] = useState(false);
   const scaleAnimation = useRef(new Animated.Value(1)).current;
   const theme = useTheme();
@@ -52,6 +54,7 @@ const Select: React.FC<Props> = ({ title, description, style }) => {
     <Pressable
       onPressIn={() => setActive(true)}
       onPressOut={() => setActive(false)}
+      onPress={onPress}
     >
       <Animated.View style={[styles.root, assertStyle(style), animatedStyles]}>
         <Typography style={styles.icon}>🙏</Typography>

@@ -24,11 +24,11 @@ import { flattenCategories } from "../utils/categories";
 
 export const Stack = createNativeStackNavigator();
 
-export enum Screens {
-  Home = "Home",
-  Second = "Second",
-  Modal = "Modal",
-  Categories = "Categories",
+export const enum Screens {
+  Home = "home",
+  Second = "second",
+  Modal = "modal",
+  Categories = "categories",
 }
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
@@ -59,12 +59,18 @@ export const Tabs = () => {
 
   return (
     <View style={styles.navbar}>
-      <Link
-        to={{ screen: Screens.Second }}
-        style={[styles.navbar__button, styles.navbar__button_bordered]}
-      >
+      {/* TODO: Typings */}
+      <Link to={{ screen: Screens.Second }} style={[styles.navbar__button]}>
         <Text>Two</Text>
       </Link>
+      {/* TODO: Typings */}
+      <Link
+        to={{ screen: Screens.Modal }}
+        style={[styles.navbar__button, styles.navbar__button_icon]}
+      >
+        <Text>+</Text>
+      </Link>
+      {/* TODO: Typings */}
       <Link to={{ screen: Screens.Home }} style={styles.navbar__button}>
         <Text>Home</Text>
       </Link>
@@ -94,17 +100,18 @@ const useLinking = (categoriesScreens: string[] = []) => {
     const result = {
       config: {
         screens: {
-          [Screens.Home as string]: "/",
-          [Screens.Modal as string]: "/modal",
-          [Screens.Second as string]: "two",
-          [Screens.Categories as string]: "categories",
-        },
+          [Screens.Home]: "/",
+          [Screens.Modal]: "/modal",
+          [Screens.Second]: "two",
+          [Screens.Categories]: "categories",
+        } as Record<string, string>,
       },
       prefixes: [],
     };
 
     for (const cs of categoriesScreens) {
-      result.config.screens[`categories/${cs}`] = `categories/${cs}`;
+      const route = `${Screens.Categories}/${cs}`;
+      result.config.screens[route] = route;
     }
 
     return result;
@@ -158,7 +165,11 @@ function RootLayoutNav() {
               component={Categories}
             />
             {categoriesScreens.map((cs) => (
-              <Stack.Screen name={`categories/${cs}`} component={Categories} />
+              <Stack.Screen
+                key={cs}
+                name={`categories/${cs}`}
+                component={Categories}
+              />
             ))}
           </Stack.Navigator>
         </ThemeProvider>
@@ -198,5 +209,12 @@ const withTheme = (t: Theme) =>
     navbar__button_bordered: {
       borderRightWidth: 1,
       borderRightColor: t.colors.surface,
+    },
+    navbar__button_icon: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      borderColor: "black",
+      borderWidth: 1,
     },
   });

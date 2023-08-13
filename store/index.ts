@@ -1,26 +1,28 @@
-import { Event, Store, createEvent, createStore, sample } from "effector";
+import { createEvent, createStore, sample } from "effector";
 
 type AccountID = string;
 
 interface Transaction {
   difference: number;
   type: string;
+  account: AccountID;
 }
 
 interface Account {
   id: AccountID;
   currency: string;
   name: string;
-  $balance: Store<number>;
-  $transactions: Store<Transaction[]>;
-  transactionAdded: Event<Transaction>;
 }
+
+type Accounts = Record<AccountID, Account>;
+type Balances = Record<AccountID, number>;
+type Transactions = Record<AccountID, Transaction[]>;
 
 export type Categories = {
   [name: string]: Categories | null;
 };
 
-export const $accounts = createStore<Account[]>([]);
+export const $accounts = createStore<Accounts>({});
 export const $categories = createStore<Categories>({
   food: {
     restaurants: {
@@ -37,14 +39,20 @@ export const $categories = createStore<Categories>({
     stocks: {
       snp500: null,
       etf: null,
-    }
-  }
+    },
+  },
 });
+export const $balances = createStore<Balances>({});
+export const $transactions = createStore<Transactions>({});
+
 export const accountAdded = createEvent<Account>();
+export const transactionAdded = createEvent<Transaction>();
 
-export const createAccount = (name: string, currency: string): Account => {
-  const id = `${Math.random() * 100}`;
-
+export const createAccount = (
+  name: string,
+  currency: string,
+  id: AccountID
+): Account => {
   const $transactions = createStore<Transaction[]>([]);
   const $balance = createStore<number>(0);
 
@@ -68,15 +76,48 @@ export const createAccount = (name: string, currency: string): Account => {
     id,
     currency,
     name,
-    $balance,
-    $transactions,
-    transactionAdded,
   };
 };
 
 sample({
   clock: accountAdded,
   source: $accounts,
-  fn: (accounts, newAccount) => [...accounts, newAccount],
+  fn: (accounts, newAccount) => ({ ...accounts, [newAccount.id]: newAccount }),
   target: $accounts,
 });
+
+sample({
+  clock: accountAdded,
+  source: $balances,
+  fn: (balances, account) => ({ ...balances, [account.id]: 0 }),
+  target: $balances,
+});
+
+sample({
+  clock: transactionAdded,
+  source: $transactions,
+  fn: (transactions, newTransaction) => {
+    const previousTransactions = transactions?.[newTransaction.account] ?? [];
+    const newTransactions = [...previousTransactions, newTransaction];
+
+    return {
+      ...transactions,
+      [newTransaction.account]: newTransactions,
+    };
+  },
+  target: $transactions,
+});
+
+$accounts.watch(console.log);
+
+const account1 = createAccount("USD", "USD", "0");
+accountAdded(account1);
+const account2 = createAccount("THB", "THB", "1");
+accountAdded(account2);
+const account3 = createAccount("RUB", "RUB", "2");
+accountAdded(account3);
+
+transactionAdded({ account: account1.id, difference: -15, type: "food" });
+transactionAdded({ account: account1.id, difference: -15, type: "food" });
+transactionAdded({ account: account1.id, difference: -15, type: "food" });
+transactionAdded({ account: account1.id, difference: -15, type: "food" });

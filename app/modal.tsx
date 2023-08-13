@@ -18,6 +18,8 @@ import Select from "../components/Select";
 import Card from "../components/Card";
 import { useNavigation } from "@react-navigation/native";
 import { Screens } from "./_layout";
+import { useStore } from "effector-react";
+import { $category } from "~/store/form";
 
 type TransactionType = "income" | "expense" | "transfer";
 
@@ -32,6 +34,7 @@ export default function Modal() {
   const theme = useTheme();
   const styles = withTheme(theme);
   const navigation = useNavigation();
+  const category = useStore($category);
 
   const onTypeChange = (newType: TransactionType) => {
     if (Platform.OS !== "web") {
@@ -132,10 +135,10 @@ export default function Modal() {
             </View>
             <Select
               title="Category"
-              description="Tap to select"
+              description={category}
               style={styles.select}
-              onPress={() =>
-                navigation.navigate(Screens.Categories as never) // TODO: ????
+              onPress={
+                () => navigation.navigate(Screens.Categories as never) // TODO: ????
               }
             />
           </View>

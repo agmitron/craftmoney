@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { test, expect } from "@jest/globals";
 import { accounts, transactions } from "./index";
+import { Account } from "./types";
 
 describe("Accounts", () => {
   test("Create an account", () => {
@@ -46,5 +47,23 @@ describe("Accounts", () => {
     expect(transactions.$transactions.getState()[0]?.length).toBeUndefined();
 
     expect(accounts.$balances.getState()[0]).toBe(0);
+  });
+
+  test("Update an account", () => {
+    accounts.reset();
+    expect(_.size(accounts.$accounts.getState())).toBe(0);
+    const account: Account = { currency: "VND", name: "VND", id: "0" };
+    accounts.create(_.omit(account, "id"));
+    expect(_.size(accounts.$accounts.getState())).toBe(1);
+
+    accounts.update({ id: "0", account: { name: "Vietnamese Dongs" } });
+    expect(accounts.$accounts.getState()["0"].name).toBe("Vietnamese Dongs")
+    expect(accounts.$accounts.getState()["0"].id).toBe("0")
+    expect(accounts.$accounts.getState()["0"].currency).toBe("VND")
+  });
+
+  test("Remove an account", () => {
+    accounts.remove("0")
+    expect(_.size(accounts.$accounts.getState())).toBe(0);
   });
 });

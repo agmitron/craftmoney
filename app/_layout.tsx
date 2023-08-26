@@ -18,7 +18,7 @@ import { Header as ModalHeader } from "../components/Modal";
 import { Theme } from "../constants/theme";
 import { useTheme } from "../components/Themed";
 import Categories from "./categories";
-import { $categories } from "../store";
+import { categories } from "../store";
 import { useStoreMap } from "effector-react";
 import { flattenCategories } from "../utils/categories";
 
@@ -29,6 +29,7 @@ export const enum Screens {
   Second = "second",
   Modal = "modal",
   Categories = "categories",
+  Accounts = "categories",
 }
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
@@ -125,7 +126,7 @@ function RootLayoutNav() {
   const theme = useTheme();
   const styles = withTheme(theme);
 
-  const categoriesScreens = useStoreMap($categories, (categories) =>
+  const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
     Object.keys(flattenCategories(categories, "", {}, "/"))
   );
 

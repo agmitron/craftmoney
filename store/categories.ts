@@ -1,5 +1,6 @@
-import { createStore } from 'effector';
-import { Categories } from './types';
+import { createStore } from "effector";
+import { Categories } from "./types";
+import { persist } from "@effector-storage/react-native-async-storage";
 
 export const $categories = createStore<Categories>({
   food: {
@@ -20,3 +21,5 @@ export const $categories = createStore<Categories>({
     },
   },
 });
+
+persist({ store: $categories, key: "$categories" });

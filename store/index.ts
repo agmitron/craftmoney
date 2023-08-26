@@ -1,6 +1,7 @@
 import _ from "lodash";
 import * as accounts from "./accounts";
 import * as transactions from "./transactions";
+import * as categories from "./categories";
 import { sample } from "effector";
 
 sample({
@@ -77,4 +78,4 @@ sample({
   target: transactions.$transactions,
 });
 
-export { accounts, transactions };
+export { accounts, transactions, categories };

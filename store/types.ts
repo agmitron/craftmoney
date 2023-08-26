@@ -3,7 +3,7 @@ export type AccountID = string;
 
 export interface Transaction {
   difference: number;
-  type: string;
+  category: string;
   account: AccountID;
 }
 

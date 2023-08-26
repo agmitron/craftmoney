@@ -21,27 +21,25 @@ import { Screens } from "./_layout";
 import { useStore } from "effector-react";
 import * as form from "~/store/form";
 
-type TransactionType = "income" | "expense" | "transfer";
-
 interface Action {
   render: (key: string | number) => React.ReactElement;
 }
 
 // TODO: move to a separate component
 export default function Modal() {
-  const [type, setType] = useState<TransactionType>("expense");
   const [isButtonHidden, setButtonHidden] = useState(false);
   const theme = useTheme();
   const styles = withTheme(theme);
   const navigation = useNavigation();
   const category = useStore(form.$category);
   const account = useStore(form.$account);
+  const type = useStore(form.$type)
 
-  const onTypeChange = (newType: TransactionType) => {
+  const onTypeChange = (newType: form.TransactionType) => {
     if (Platform.OS !== "web") {
       Haptics.selectionAsync();
     }
-    setType(newType);
+    form.selectType(newType)
   };
 
   const additionalActions: Action[] = [
@@ -85,6 +83,11 @@ export default function Modal() {
     };
   }, []);
 
+  const onSubmit = () => {
+    form.submit()
+    navigation.navigate(Screens.Home as never) // TODO
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -102,7 +105,7 @@ export default function Modal() {
                 left: (
                   <View style={styles.operation}>
                     <Typography color={theme.colors.typography.secondary}>
-                      {type === "income" ? "+" : "-"}
+                      {type === form.TransactionType.Income ? "+" : "-"}
                     </Typography>
                   </View>
                 ),
@@ -110,25 +113,26 @@ export default function Modal() {
               keyboardType="number-pad"
               returnKeyType="done"
               style={styles.input}
+              onChangeText={form.setDifference}
             />
             <View style={styles.types}>
               <Button
-                variant={type === "transfer" ? "contained" : "outlined"}
-                onPress={() => onTypeChange("transfer")}
+                variant={type === form.TransactionType.Transfer ? "contained" : "outlined"}
+                onPress={() => onTypeChange(form.TransactionType.Transfer)}
                 style={styles.type}
               >
                 Transfer
               </Button>
               <Button
-                variant={type === "income" ? "contained" : "outlined"}
-                onPress={() => onTypeChange("income")}
+                variant={type === form.TransactionType.Income ? "contained" : "outlined"}
+                onPress={() => onTypeChange(form.TransactionType.Income)}
                 style={styles.type}
               >
                 Income
               </Button>
               <Button
-                variant={type === "expense" ? "contained" : "outlined"}
-                onPress={() => onTypeChange("expense")}
+                variant={type === form.TransactionType.Expense ? "contained" : "outlined"}
+                onPress={() => onTypeChange(form.TransactionType.Expense)}
                 style={styles.type}
               >
                 Expense
@@ -165,7 +169,7 @@ export default function Modal() {
         </ScrollView>
         {!isButtonHidden && (
           <View style={{ paddingHorizontal: 17, paddingBottom: 20 }}>
-            <Button size="large">Add</Button>
+            <Button size="large" onPress={onSubmit}>Add</Button>
           </View>
         )}
       </SafeAreaView>

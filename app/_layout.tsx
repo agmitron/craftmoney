@@ -21,6 +21,7 @@ import Categories from "./categories";
 import { categories } from "../store";
 import { useStoreMap } from "effector-react";
 import { flattenCategories } from "../utils/categories";
+import Accounts from './accounts';
 
 export const Stack = createNativeStackNavigator();
 
@@ -29,7 +30,7 @@ export const enum Screens {
   Second = "second",
   Modal = "modal",
   Categories = "categories",
-  Accounts = "categories",
+  Accounts = "accounts",
 }
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
@@ -105,6 +106,7 @@ const useLinking = (categoriesScreens: string[] = []) => {
           [Screens.Modal]: "/modal",
           [Screens.Second]: "two",
           [Screens.Categories]: "categories",
+          [Screens.Accounts]: "accounts",
         } as Record<string, string>,
       },
       prefixes: [],
@@ -159,11 +161,11 @@ function RootLayoutNav() {
             />
             <Stack.Screen
               name={Screens.Categories}
-              // options={{
-              //   presentation: "modal",
-              //   header: () => <ModalHeader text="Select a category" />,
-              // }}
               component={Categories}
+            />
+            <Stack.Screen
+              name={Screens.Accounts}
+              component={Accounts}
             />
             {categoriesScreens.map((cs) => (
               <Stack.Screen

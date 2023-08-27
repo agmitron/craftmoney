@@ -1,14 +1,15 @@
+import { PropsWithChildren, useState } from "react";
 import {
   Pressable,
-  Text,
-  StyleSheet,
   PressableProps,
-  ViewStyle,
   StyleProp,
+  StyleSheet,
+  Text,
+  ViewStyle,
 } from "react-native";
+
 import { useTheme } from "./Themed";
 import { Theme } from "../constants/theme";
-import { PropsWithChildren, useState } from "react";
 import { assertStyle } from "../utils/style";
 
 type Variant = "contained" | "outlined";
@@ -31,7 +32,7 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
   const theme = useTheme();
   const styles = withTheme(theme, variant, size);
 
-  const activeStyles = isActive ? styles._active : {}
+  const activeStyles = isActive ? styles._active : {};
 
   return (
     <Pressable
@@ -64,7 +65,7 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
     size_medium: {},
     size_large: {},
     _active: {
-      opacity: 0.9
+      opacity: 0.9,
     },
     text: {
       color:

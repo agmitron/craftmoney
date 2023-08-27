@@ -1,3 +1,7 @@
+import { useNavigation } from "@react-navigation/native";
+import { useStore, useStoreMap } from "effector-react";
+import * as Haptics from "expo-haptics";
+import { useEffect, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -7,23 +11,21 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { useEffect, useState } from "react";
-import Typography from "../components/Typography";
-import * as Haptics from "expo-haptics";
+
+import { Screens } from "./_layout";
+import Button from "../components/Button";
+import Card from "../components/Card";
+import Select from "../components/Select";
 import TextField from "../components/TextField";
 import { useTheme } from "../components/Themed";
-import Button from "../components/Button";
+import Typography from "../components/Typography";
 import { Theme } from "../constants/theme";
-import Select from "../components/Select";
-import Card from "../components/Card";
-import { useNavigation } from "@react-navigation/native";
-import { Screens } from "./_layout";
-import { useStore, useStoreMap } from "effector-react";
-import * as form from "~/store/form";
+
 import DatePicker from "~/components/DatePicker";
+import * as form from "~/store/form";
 
 interface Action {
-  render: (key: string | number) => React.ReactElement;
+  Component: (key: string | number) => React.ReactElement;
 }
 
 // TODO: move to a separate component
@@ -46,12 +48,12 @@ export default function Modal() {
   // TODO: make dynamic
   const additionalActions: Action[] = [
     {
-      render: (key) => {
+      Component: (key) => {
         const [isOpen, setOpen] = useState(false);
 
         const date = useStoreMap(
           form.$additional,
-          ({ timestamp }) => new Date(timestamp)
+          ({ timestamp }) => new Date(timestamp),
         );
 
         return (
@@ -70,7 +72,7 @@ export default function Modal() {
       },
     },
     {
-      render: (key) => {
+      Component: (key) => {
         return (
           <View
             key={key}

@@ -1,5 +1,6 @@
 import { Link } from "@react-navigation/native";
 import { StyleSheet, Text, View } from "react-native";
+
 import { Stack } from "./_layout";
 
 export default function NotFoundScreen() {

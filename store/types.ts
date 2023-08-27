@@ -3,14 +3,14 @@ export type Difference = number;
 export type AccountID = string;
 export type Additional = {
   timestamp: number;
-  [key: string]: any
-}
+  [key: string]: any;
+};
 
 export interface Transaction {
   difference: Difference;
   category: Category;
   account: AccountID;
-  additional: Additional
+  additional: Additional;
 }
 
 export interface Account {

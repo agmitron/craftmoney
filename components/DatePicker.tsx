@@ -1,6 +1,7 @@
-import RNDatePicker from "react-native-date-picker";
+import { createElement, createRef } from "react";
 import { Platform } from "react-native";
-import { createElement, createRef, useEffect } from "react";
+import RNDatePicker from "react-native-date-picker";
+
 import { formatDateToISOString } from "~/utils/date";
 
 interface Props {

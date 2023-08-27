@@ -1,8 +1,9 @@
-import _ from "lodash";
-import * as accounts from "./accounts";
-import * as transactions from "./transactions";
-import * as categories from "./categories";
 import { sample } from "effector";
+import _ from "lodash";
+
+import * as accounts from "./accounts";
+import * as categories from "./categories";
+import * as transactions from "./transactions";
 
 sample({
   clock: accounts.create,
@@ -47,7 +48,7 @@ sample({
         ...accumulator,
         [accountID]: balances[accountID] ?? 0,
       }),
-      {}
+      {},
     ),
   target: accounts.$balances,
 });

@@ -4,7 +4,7 @@ export function flattenCategories(
   categories: Categories,
   prefix: string = "",
   result: Categories = {},
-  separator: string = "."
+  separator: string = ".",
 ): Categories {
   for (const key in categories) {
     if (categories.hasOwnProperty(key)) {

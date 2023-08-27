@@ -7,21 +7,22 @@ import {
   ThemeProvider,
   useRoute,
 } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useStoreMap } from "effector-react";
 import { useFonts } from "expo-font";
 import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View, useColorScheme } from "react-native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import TabOneScreen from "./(tabs)";
 import TabTwoScreen from "./(tabs)/two";
+import Accounts from "./accounts";
+import Categories from "./categories";
 import Modal from "./modal";
 import { Header as ModalHeader } from "../components/Modal";
-import { Theme } from "../constants/theme";
 import { useTheme } from "../components/Themed";
-import Categories from "./categories";
+import { Theme } from "../constants/theme";
 import { categories } from "../store";
-import { useStoreMap } from "effector-react";
 import { flattenCategories } from "../utils/categories";
-import Accounts from './accounts';
 
 export const Stack = createNativeStackNavigator();
 
@@ -80,13 +81,13 @@ export const Tabs = () => {
   );
 };
 
-function withTabs<T>(
-  Component: () => React.ReactElement
+function useTabs<T>(
+  Component: () => React.ReactElement,
 ): (props: T) => React.ReactElement {
   const theme = useTheme();
   const styles = withTheme(theme);
 
-  return (_: T) => {
+  const Container = (_: T) => {
     const route = useRoute();
     return (
       <View style={styles.root}>
@@ -95,6 +96,8 @@ function withTabs<T>(
       </View>
     );
   };
+
+  return Container;
 }
 
 const useLinking = (categoriesScreens: string[] = []) => {
@@ -129,10 +132,13 @@ function RootLayoutNav() {
   const styles = withTheme(theme);
 
   const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/"))
+    Object.keys(flattenCategories(categories, "", {}, "/")),
   );
 
   const linking = useLinking(categoriesScreens);
+
+  const tabOne = useTabs(TabOneScreen);
+  const tabTwo = useTabs(TabTwoScreen);
 
   return (
     <NavigationContainer linking={linking}>
@@ -144,12 +150,12 @@ function RootLayoutNav() {
             <Stack.Screen
               name={Screens.Home}
               // options={{ headerShown: false }}
-              component={withTabs(TabOneScreen)}
+              component={tabOne}
             />
             <Stack.Screen
               name={Screens.Second}
               // options={{ headerShown: false }}
-              component={withTabs(TabTwoScreen)}
+              component={tabTwo}
             />
             <Stack.Screen
               name={Screens.Modal}
@@ -159,14 +165,8 @@ function RootLayoutNav() {
               }}
               component={Modal}
             />
-            <Stack.Screen
-              name={Screens.Categories}
-              component={Categories}
-            />
-            <Stack.Screen
-              name={Screens.Accounts}
-              component={Accounts}
-            />
+            <Stack.Screen name={Screens.Categories} component={Categories} />
+            <Stack.Screen name={Screens.Accounts} component={Accounts} />
             {categoriesScreens.map((cs) => (
               <Stack.Screen
                 key={cs}

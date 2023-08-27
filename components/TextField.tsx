@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
-import { TextInput, StyleSheet, View, TextInputProps } from "react-native";
+import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
+
 import { useTheme } from "./Themed";
-import { assertStyle } from "../utils/style";
 import { Theme } from "../constants/theme";
+import { assertStyle } from "../utils/style";
 
 interface Props extends TextInputProps {
   decorations?: {
@@ -57,7 +58,7 @@ const withTheme = (t: Theme) =>
     input: {
       borderRadius: 10,
       width: "100%",
-      fontSize: 17
+      fontSize: 17,
     },
     input_size_large: {
       paddingVertical: 16,

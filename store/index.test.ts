@@ -1,5 +1,6 @@
+import { expect, test } from "@jest/globals";
 import _ from "lodash";
-import { test, expect } from "@jest/globals";
+
 import { accounts, transactions } from "./index";
 import { Account } from "./types";
 
@@ -57,13 +58,13 @@ describe("Accounts", () => {
     expect(_.size(accounts.$accounts.getState())).toBe(1);
 
     accounts.update({ id: "0", account: { name: "Vietnamese Dongs" } });
-    expect(accounts.$accounts.getState()["0"].name).toBe("Vietnamese Dongs")
-    expect(accounts.$accounts.getState()["0"].id).toBe("0")
-    expect(accounts.$accounts.getState()["0"].currency).toBe("VND")
+    expect(accounts.$accounts.getState()["0"].name).toBe("Vietnamese Dongs");
+    expect(accounts.$accounts.getState()["0"].id).toBe("0");
+    expect(accounts.$accounts.getState()["0"].currency).toBe("VND");
   });
 
   test("Remove an account", () => {
-    accounts.remove("0")
+    accounts.remove("0");
     expect(_.size(accounts.$accounts.getState())).toBe(0);
   });
 });

@@ -1,8 +1,9 @@
-import { test, expect } from "@jest/globals";
-import { flattenCategories } from './categories';
+import { expect, test } from "@jest/globals";
 
-describe('utils/categories.ts', () => {
-  test('flattenCategories', () => {
+import { flattenCategories } from "./categories";
+
+describe("utils/categories.ts", () => {
+  test("flattenCategories", () => {
     const categories = {
       food: {
         restaurants: {
@@ -19,16 +20,16 @@ describe('utils/categories.ts', () => {
         stocks: {
           snp500: null,
           etf: null,
-        }
-      }
-    }
+        },
+      },
+    };
 
     const expected = {
-      "food": null,
+      food: null,
       "food.restaurants": null,
       "food.restaurants.kfc": null,
       "food.restaurants.mcdonalds": null,
-      "investments": null,
+      investments: null,
       "investments.crypto": null,
       "investments.crypto.altcoins": null,
       "investments.crypto.web3": null,
@@ -36,14 +37,14 @@ describe('utils/categories.ts', () => {
       "investments.stocks": null,
       "investments.stocks.snp500": null,
       "investments.stocks.etf": null,
-    }
+    };
 
-    const actual = flattenCategories(categories)
+    const actual = flattenCategories(categories);
 
-    expect(actual).toStrictEqual(expected)
-  })
+    expect(actual).toStrictEqual(expected);
+  });
 
-  test('flattenCategories with another separator', () => {
+  test("flattenCategories with another separator", () => {
     const categories = {
       food: {
         restaurants: {
@@ -60,16 +61,16 @@ describe('utils/categories.ts', () => {
         stocks: {
           snp500: null,
           etf: null,
-        }
-      }
-    }
+        },
+      },
+    };
 
     const expected = {
-      "food": null,
+      food: null,
       "food/restaurants": null,
       "food/restaurants/kfc": null,
       "food/restaurants/mcdonalds": null,
-      "investments": null,
+      investments: null,
       "investments/crypto": null,
       "investments/crypto/altcoins": null,
       "investments/crypto/web3": null,
@@ -77,10 +78,10 @@ describe('utils/categories.ts', () => {
       "investments/stocks": null,
       "investments/stocks/snp500": null,
       "investments/stocks/etf": null,
-    }
+    };
 
-    const actual = flattenCategories(categories, "", {}, "/")
+    const actual = flattenCategories(categories, "", {}, "/");
 
-    expect(actual).toStrictEqual(expected)
-  })
-})
+    expect(actual).toStrictEqual(expected);
+  });
+});

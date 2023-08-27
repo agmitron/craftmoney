@@ -1,4 +1,6 @@
 import { createEvent, createStore, sample } from "effector";
+
+import { transactions } from "./index";
 import {
   Account,
   Additional,
@@ -6,7 +8,7 @@ import {
   Difference,
   Transaction,
 } from "./types";
-import { transactions } from "./index";
+
 import { Results, Rules, isFailed, isSuccessful } from "~/utils/validation";
 
 export enum TransactionType {

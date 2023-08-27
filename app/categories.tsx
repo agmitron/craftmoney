@@ -1,14 +1,16 @@
-import { StyleSheet, View } from "react-native";
-import _ from "lodash";
-import { categories } from "../store";
-import Select from "~/components/Select";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
-import { selectCategory } from "~/store/form";
-import { Screens } from "./_layout";
+import _ from "lodash";
 import { useMemo } from "react";
-import { Theme } from "~/constants/theme";
+import { StyleSheet, View } from "react-native";
+
+import { Screens } from "./_layout";
+import { categories } from "../store";
+
+import Select from "~/components/Select";
 import { useTheme } from "~/components/Themed";
+import { Theme } from "~/constants/theme";
+import { selectCategory } from "~/store/form";
 
 const Categories: React.FC = () => {
   const route = useRoute();
@@ -50,12 +52,12 @@ const Categories: React.FC = () => {
         <Select
           title={currentCategory}
           onPress={() => onPress(currentCategory)}
-          emoji={"👍"}
+          emoji="👍"
         />
       )}
       <View style={styles.separator} />
       {Object.keys(_categories).map((c) => (
-        <Select key={c} title={c} onPress={() => onPress(c)} emoji={"👀"} />
+        <Select key={c} title={c} onPress={() => onPress(c)} emoji="👀" />
       ))}
     </View>
   );

@@ -1,5 +1,6 @@
 import { PropsWithChildren, useMemo } from "react";
 import { StyleProp, StyleSheet, Text, TextStyle } from "react-native";
+
 import { useTheme } from "./Themed";
 
 interface Props {
@@ -26,7 +27,7 @@ const Typography: React.FC<PropsWithChildren<Props>> = ({
       textAlign: align,
       ...(typeof style === "object" ? style : {}),
     }),
-    []
+    [],
   );
 
   return <Text style={s}>{children}</Text>;

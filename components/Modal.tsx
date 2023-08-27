@@ -1,9 +1,9 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
+
 // import { useStore } from "effector-react";
-import Typography from "./Typography";
 import { useTheme } from "./Themed";
+import Typography from "./Typography";
 import { Theme } from "../constants/theme";
-import { $categories } from '../store';
 
 interface HeaderProps {
   text: string;

@@ -1,15 +1,19 @@
-import { StyleSheet, View } from "react-native";
-import Typography from "../../components/Typography";
 import { useStore, useStoreMap } from "effector-react";
-import { accounts, transactions } from "../../store";
+import { StyleSheet, View } from "react-native";
+
 import Card from "../../components/Card";
+import Typography from "../../components/Typography";
+import { accounts, transactions } from "../../store";
 
 export default function TabOneScreen() {
   const _accounts = useStore(accounts.$accounts);
   const _balances = useStore(accounts.$balances);
-  const allTransactions = useStoreMap(transactions.$transactions, (transactions) => {
-    return Object.values(transactions).flat();
-  });
+  const allTransactions = useStoreMap(
+    transactions.$transactions,
+    (transactions) => {
+      return Object.values(transactions).flat();
+    },
+  );
 
   return (
     <View style={styles.root}>
@@ -28,7 +32,9 @@ export default function TabOneScreen() {
         {allTransactions.map(({ account, difference, category }) => (
           <Card>
             <Typography variant="title">{category}</Typography>
-            <Typography variant="subtitle">{_accounts[account].name}</Typography>
+            <Typography variant="subtitle">
+              {_accounts[account].name}
+            </Typography>
             <Typography variant="text">{difference}</Typography>
           </Card>
         ))}
@@ -58,5 +64,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 20,
   },
-  transactions: {}
+  transactions: {},
 });

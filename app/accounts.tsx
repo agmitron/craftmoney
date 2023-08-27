@@ -1,19 +1,19 @@
-import { View } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
-import _ from "lodash";
+import { View } from "react-native";
+
+import { Screens } from "./_layout";
 import { accounts } from "../store";
+
 import Select from "~/components/Select";
 import * as form from "~/store/form";
 import { Account } from "~/store/types";
-import { Screens } from "./_layout";
-import { useEffect } from 'react';
 
 const Accounts: React.FC = () => {
   const navigation = useNavigation();
 
   const _accounts = useStoreMap(accounts.$accounts, (accounts) =>
-    Object.values(accounts)
+    Object.values(accounts),
   );
 
   const onPress = (account: Account) => {
@@ -28,7 +28,7 @@ const Accounts: React.FC = () => {
           key={account.id}
           title={account.name}
           onPress={() => onPress(account)}
-          emoji={"👀"}
+          emoji="👀"
         />
       ))}
     </View>

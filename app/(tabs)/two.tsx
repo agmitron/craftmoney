@@ -1,5 +1,6 @@
-import { StyleSheet, View } from 'react-native';
-import Typography from '../../components/Typography';
+import { StyleSheet, View } from "react-native";
+
+import Typography from "../../components/Typography";
 
 export default function TabTwoScreen() {
   return (
@@ -12,7 +13,7 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

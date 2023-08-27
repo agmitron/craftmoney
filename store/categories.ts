@@ -1,6 +1,7 @@
-import { createStore } from "effector";
-import { Categories } from "./types";
 import { persist } from "@effector-storage/react-native-async-storage";
+import { createStore } from "effector";
+
+import { Categories } from "./types";
 
 export const $categories = createStore<Categories>({
   food: {

@@ -1,17 +1,18 @@
+import { useEffect, useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-  Pressable,
   Animated,
   GestureResponderEvent,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
 } from "react-native";
-import { Theme } from "../constants/theme";
-import Typography from "./Typography";
+
 import { useTheme } from "./Themed";
+import Typography from "./Typography";
+import { Theme } from "../constants/theme";
 import { assertStyle } from "../utils/style";
-import { useEffect, useRef, useState } from "react";
 
 interface Props {
   title: string;

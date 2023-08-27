@@ -1,6 +1,7 @@
-import _ from "lodash";
-import { createEvent, createStore } from "effector";
 import { persist } from "@effector-storage/react-native-async-storage";
+import { createEvent, createStore } from "effector";
+import _ from "lodash";
+
 import { Account, AccountID, Accounts, Balances } from "./types";
 
 export const $accounts = createStore<Accounts>({

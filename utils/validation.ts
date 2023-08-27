@@ -17,9 +17,9 @@ export type Failed<T extends Value> = {
 };
 
 export const isSuccessful = <T extends Value>(
-  value: Results<T>
+  value: Results<T>,
 ): value is Successful<T> => Object.values(value).every(Boolean);
 
 export const isFailed = <T extends Value>(
-  value: Results<T>
-): value is Successful<T> => Object.values(value).some((v) => !Boolean(v));
+  value: Results<T>,
+): value is Successful<T> => Object.values(value).some((v) => !v);

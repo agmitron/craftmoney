@@ -25,9 +25,9 @@ export default function TabOneScreen() {
       </View>
 
       <View style={styles.transactions}>
-        {allTransactions.map(({ account, difference, type }) => (
+        {allTransactions.map(({ account, difference, category }) => (
           <Card>
-            <Typography variant="title">{type}</Typography>
+            <Typography variant="title">{category}</Typography>
             <Typography variant="subtitle">{_accounts[account].name}</Typography>
             <Typography variant="text">{difference}</Typography>
           </Card>

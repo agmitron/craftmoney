@@ -1,4 +1,5 @@
-
+export type Category = string;
+export type Difference = number;
 export type AccountID = string;
 export type Additional = {
   timestamp: number;
@@ -6,8 +7,8 @@ export type Additional = {
 }
 
 export interface Transaction {
-  difference: number;
-  category: string;
+  difference: Difference;
+  category: Category;
   account: AccountID;
   additional: Additional
 }

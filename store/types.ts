@@ -1,10 +1,15 @@
 
 export type AccountID = string;
+export type Additional = {
+  timestamp: number;
+  [key: string]: any
+}
 
 export interface Transaction {
   difference: number;
   category: string;
   account: AccountID;
+  additional: Additional
 }
 
 export interface Account {

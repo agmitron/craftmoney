@@ -18,8 +18,9 @@ import Select from "../components/Select";
 import Card from "../components/Card";
 import { useNavigation } from "@react-navigation/native";
 import { Screens } from "./_layout";
-import { useStore } from "effector-react";
+import { useStore, useStoreMap } from "effector-react";
 import * as form from "~/store/form";
+import DatePicker from "~/components/DatePicker";
 
 interface Action {
   render: (key: string | number) => React.ReactElement;
@@ -33,22 +34,40 @@ export default function Modal() {
   const navigation = useNavigation();
   const category = useStore(form.$category);
   const account = useStore(form.$account);
-  const type = useStore(form.$type)
+  const type = useStore(form.$type);
 
   const onTypeChange = (newType: form.TransactionType) => {
     if (Platform.OS !== "web") {
       Haptics.selectionAsync();
     }
-    form.selectType(newType)
+    form.selectType(newType);
   };
 
+  // TODO: make dynamic
   const additionalActions: Action[] = [
     {
-      render: (key) => (
-        <View key={key} style={styles["additional__list-item"]}>
-          <Typography>Date</Typography>
-        </View>
-      ),
+      render: (key) => {
+        const [isOpen, setOpen] = useState(false);
+
+        const date = useStoreMap(
+          form.$additional,
+          ({ timestamp }) => new Date(timestamp)
+        );
+
+        return (
+          <View key={key} style={styles["additional__list-item"]}>
+            <DatePicker
+              isOpen={isOpen}
+              date={date}
+              onConfirm={(date) => {
+                form.setAdditional({ timestamp: date.getTime() });
+                setOpen(false);
+              }}
+              onCancel={() => setOpen(false)}
+            />
+          </View>
+        );
+      },
     },
     {
       render: (key) => {
@@ -66,6 +85,7 @@ export default function Modal() {
               size="small"
               returnKeyLabel="done"
               returnKeyType="done"
+              onChangeText={(note) => form.setAdditional({ note })}
             />
           </View>
         );
@@ -84,9 +104,9 @@ export default function Modal() {
   }, []);
 
   const onSubmit = () => {
-    form.submit()
-    navigation.navigate(Screens.Home as never) // TODO
-  }
+    form.submit();
+    navigation.navigate(Screens.Home as never); // TODO
+  };
 
   return (
     <KeyboardAvoidingView
@@ -117,21 +137,33 @@ export default function Modal() {
             />
             <View style={styles.types}>
               <Button
-                variant={type === form.TransactionType.Transfer ? "contained" : "outlined"}
+                variant={
+                  type === form.TransactionType.Transfer
+                    ? "contained"
+                    : "outlined"
+                }
                 onPress={() => onTypeChange(form.TransactionType.Transfer)}
                 style={styles.type}
               >
                 Transfer
               </Button>
               <Button
-                variant={type === form.TransactionType.Income ? "contained" : "outlined"}
+                variant={
+                  type === form.TransactionType.Income
+                    ? "contained"
+                    : "outlined"
+                }
                 onPress={() => onTypeChange(form.TransactionType.Income)}
                 style={styles.type}
               >
                 Income
               </Button>
               <Button
-                variant={type === form.TransactionType.Expense ? "contained" : "outlined"}
+                variant={
+                  type === form.TransactionType.Expense
+                    ? "contained"
+                    : "outlined"
+                }
                 onPress={() => onTypeChange(form.TransactionType.Expense)}
                 style={styles.type}
               >
@@ -169,7 +201,9 @@ export default function Modal() {
         </ScrollView>
         {!isButtonHidden && (
           <View style={{ paddingHorizontal: 17, paddingBottom: 20 }}>
-            <Button size="large" onPress={onSubmit}>Add</Button>
+            <Button size="large" onPress={onSubmit}>
+              Add
+            </Button>
           </View>
         )}
       </SafeAreaView>

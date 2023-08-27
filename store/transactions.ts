@@ -1,4 +1,4 @@
-import { createEvent, createStore, sample } from "effector";
+import { createEvent, createStore } from "effector";
 import { Transactions, Transaction } from "./types";
 import { persist } from "@effector-storage/react-native-async-storage";
 

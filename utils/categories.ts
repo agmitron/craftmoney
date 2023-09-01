@@ -1,4 +1,4 @@
-import { Categories } from "../store";
+import { Categories } from "~/store/types";
 
 export function flattenCategories(
   categories: Categories,

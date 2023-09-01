@@ -10,7 +10,7 @@ import { categories } from "../store";
 import Select from "~/components/Select";
 import { useTheme } from "~/components/Themed";
 import { Theme } from "~/constants/theme";
-import { selectCategory } from "~/store/form";
+import { incomeExpenseForm } from "~/store/form";
 
 const Categories: React.FC = () => {
   const route = useRoute();
@@ -37,12 +37,12 @@ const Categories: React.FC = () => {
 
   const onPress = (category: string, action: "select" | "dive") => {
     if (action === "select") {
-      selectCategory(category);
+      incomeExpenseForm.selectCategory(category);
       return navigation.navigate(Screens.Modal as never);
     }
 
     const nested = _categories[category];
-    selectCategory(`${currentCategory}.${category}`);
+    incomeExpenseForm.selectCategory(`${currentCategory}.${category}`);
 
     if (nested !== null) {
       return navigation.navigate(`${route.name}/${category}` as never); // TODO

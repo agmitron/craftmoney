@@ -12,8 +12,10 @@ export default function TabOneScreen() {
     transactions.$transactions,
     (transactions) => {
       return Object.values(transactions).flat();
-    },
+    }
   );
+
+  console.log({ _accounts, allTransactions });
 
   return (
     <View style={styles.root}>
@@ -29,13 +31,13 @@ export default function TabOneScreen() {
       </View>
 
       <View style={styles.transactions}>
-        {allTransactions.map(({ account, difference, category }) => (
+        {allTransactions.map(({ account, amount, category }) => (
           <Card>
             <Typography variant="title">{category}</Typography>
             <Typography variant="subtitle">
               {_accounts[account].name}
             </Typography>
-            <Typography variant="text">{difference}</Typography>
+            <Typography variant="text">{amount}</Typography>
           </Card>
         ))}
       </View>

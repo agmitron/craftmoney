@@ -3,6 +3,10 @@ import { createStore } from "effector";
 
 import { Categories } from "./types";
 
+export enum SystemCategories {
+  Transfer = "__transfer__",
+}
+
 export const $categories = createStore<Categories>({
   food: {
     restaurants: {

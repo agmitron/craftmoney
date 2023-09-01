@@ -48,7 +48,7 @@ sample({
         ...accumulator,
         [accountID]: balances[accountID] ?? 0,
       }),
-      {},
+      {}
     ),
   target: accounts.$balances,
 });
@@ -58,7 +58,7 @@ sample({
   source: accounts.$balances,
   fn: (balances, transaction) => {
     const previousBalance = balances[transaction.account];
-    const newBalance = previousBalance + transaction.difference;
+    const newBalance = previousBalance + transaction.amount;
     return { ...balances, [transaction.account]: newBalance };
   },
   target: accounts.$balances,
@@ -67,13 +67,44 @@ sample({
 sample({
   clock: transactions.create,
   source: transactions.$transactions,
-  fn: (transactions, newTransaction) => {
-    const previousTransactions = transactions?.[newTransaction.account] ?? [];
-    const newTransactions = [...previousTransactions, newTransaction];
+  fn: (previous, tx) => {
+    const newTransactions = [
+      ...transactions.getAccountTransactions(previous, tx.account),
+      tx,
+    ];
 
     return {
-      ...transactions,
-      [newTransaction.account]: newTransactions,
+      ...previous,
+      [tx.account]: newTransactions,
+    };
+  },
+  target: transactions.$transactions,
+});
+
+sample({
+  clock: transactions.transfer,
+  source: transactions.$transactions,
+  fn: (previous, tx) => {
+    return {
+      ...previous,
+      [tx.from]: [
+        ...transactions.getAccountTransactions(previous, tx.from),
+        {
+          account: tx.from,
+          additional: tx.additional,
+          amount: tx.amount * -1,
+          category: categories.SystemCategories.Transfer,
+        },
+      ],
+      [tx.to]: [
+        ...transactions.getAccountTransactions(previous, tx.to),
+        {
+          account: tx.to,
+          additional: tx.additional,
+          amount: tx.amount,
+          category: categories.SystemCategories.Transfer,
+        },
+      ],
     };
   },
   target: transactions.$transactions,

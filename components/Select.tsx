@@ -20,6 +20,7 @@ interface Props {
   style?: StyleProp<ViewStyle>;
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
   emoji?: string;
+  decoration?: React.ReactNode;
 }
 
 const Select: React.FC<Props> = ({
@@ -28,6 +29,7 @@ const Select: React.FC<Props> = ({
   style,
   onPress,
   emoji,
+  decoration,
 }) => {
   const [isActive, setActive] = useState(false);
   const scaleAnimation = useRef(new Animated.Value(1)).current;
@@ -75,6 +77,7 @@ const Select: React.FC<Props> = ({
             {description}
           </Typography>
         </View>
+        <View style={styles.decoration}>{decoration}</View>
       </Animated.View>
     </Pressable>
   );
@@ -105,6 +108,10 @@ const withTheme = (t: Theme) =>
     },
     icon: {
       fontSize: 40,
+    },
+    decoration: {
+      marginLeft: "auto",
+      marginRight: 0,
     },
   });
 

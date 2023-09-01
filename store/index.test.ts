@@ -22,21 +22,28 @@ describe("Accounts", () => {
     expect(account.name).toBe("account2");
 
     transactions.create({
-      difference: 15,
-      type: "Salary",
+      amount: 15,
       account: account.id,
+      category: "Salary",
+      additional: { timestamp: Date.now() },
     });
 
     expect(_.size(accounts.$balances.getState())).toBe(2);
     expect(accounts.$balances.getState()[account.id]).toBe(15);
 
-    transactions.create({ difference: -15, type: "Food", account: account.id });
+    transactions.create({
+      amount: -15,
+      category: "Food",
+      account: account.id,
+      additional: { timestamp: Date.now() },
+    });
     expect(accounts.$balances.getState()[account.id]).toBe(0);
 
     transactions.create({
-      difference: 15,
-      type: "Salary",
+      amount: 15,
+      category: "Salary",
       account: account.id,
+      additional: { timestamp: Date.now() },
     });
 
     expect(_.size(accounts.$balances.getState())).toBe(2);

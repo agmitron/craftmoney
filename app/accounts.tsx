@@ -1,23 +1,33 @@
 import { useNavigation } from "@react-navigation/native";
-import { useStoreMap } from "effector-react";
+import { useStore, useStoreMap } from "effector-react";
 import { View } from "react-native";
 
 import { Screens } from "./_layout";
 import { accounts } from "../store";
 
 import Select from "~/components/Select";
-import * as form from "~/store/form";
+import {
+  $type,
+  TransactionType,
+  incomeExpenseForm,
+  transferForm,
+} from "~/store/form";
 import { Account } from "~/store/types";
 
-const Accounts: React.FC = () => {
-  const navigation = useNavigation();
+interface Props {
+  onChange: (account: Account) => void;
+}
 
+const Accounts: React.FC<Props> = ({
+  onChange = incomeExpenseForm.selectAccount,
+}) => {
+  const navigation = useNavigation();
   const _accounts = useStoreMap(accounts.$accounts, (accounts) =>
-    Object.values(accounts),
+    Object.values(accounts)
   );
 
   const onPress = (account: Account) => {
-    form.selectAccount(account);
+    onChange(account);
     navigation.navigate(Screens.Modal as never);
   };
 

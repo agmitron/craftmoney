@@ -9,5 +9,6 @@ import theme, { Theme } from "../constants/theme";
 
 export function useTheme(_variant: "light" | "dark" = "light"): Theme {
   const variant = useColorScheme() ?? _variant;
-  return theme[variant];
+  // return theme[variant];
+  return theme.light; // TODO
 }

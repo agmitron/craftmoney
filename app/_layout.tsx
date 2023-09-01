@@ -23,6 +23,7 @@ import { useTheme } from "../components/Themed";
 import { Theme } from "../constants/theme";
 import { categories } from "../store";
 import { flattenCategories } from "../utils/categories";
+import { incomeExpenseForm, transferForm } from "~/store/form";
 
 export const Stack = createNativeStackNavigator();
 
@@ -32,6 +33,8 @@ export const enum Screens {
   Modal = "modal",
   Categories = "categories",
   Accounts = "accounts",
+  AccountsTransferTo = "accounts/transfer/to",
+  AccountsTransferFrom = "accounts/transfer/from",
 }
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
@@ -63,18 +66,24 @@ export const Tabs = () => {
   return (
     <View style={styles.navbar}>
       {/* TODO: Typings */}
-      <Link to={{ screen: Screens.Second }} style={[styles.navbar__button]}>
+      <Link
+        to={{ screen: Screens.Second as "second" }}
+        style={[styles.navbar__button]}
+      >
         <Text>Two</Text>
       </Link>
       {/* TODO: Typings */}
       <Link
-        to={{ screen: Screens.Modal }}
+        to={{ screen: Screens.Modal as "modal" }}
         style={[styles.navbar__button, styles.navbar__button_icon]}
       >
         <Text>+</Text>
       </Link>
       {/* TODO: Typings */}
-      <Link to={{ screen: Screens.Home }} style={styles.navbar__button}>
+      <Link
+        to={{ screen: Screens.Home as "home" }}
+        style={styles.navbar__button}
+      >
         <Text>Home</Text>
       </Link>
     </View>
@@ -82,7 +91,7 @@ export const Tabs = () => {
 };
 
 function useTabs<T>(
-  Component: () => React.ReactElement,
+  Component: () => React.ReactElement
 ): (props: T) => React.ReactElement {
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -110,6 +119,8 @@ const useLinking = (categoriesScreens: string[] = []) => {
           [Screens.Second]: "two",
           [Screens.Categories]: "categories",
           [Screens.Accounts]: "accounts",
+          [Screens.AccountsTransferFrom]: "accounts/transfer/from",
+          [Screens.AccountsTransferTo]: "accounts/transfer/to",
         } as Record<string, string>,
       },
       prefixes: [],
@@ -132,7 +143,7 @@ function RootLayoutNav() {
   const styles = withTheme(theme);
 
   const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/")),
+    Object.keys(flattenCategories(categories, "", {}, "/"))
   );
 
   const linking = useLinking(categoriesScreens);
@@ -165,8 +176,26 @@ function RootLayoutNav() {
               }}
               component={Modal}
             />
+
+            <Stack.Screen
+              name={Screens.Accounts}
+              component={() => (
+                <Accounts onChange={incomeExpenseForm.selectAccount} />
+              )}
+            />
+
+            <Stack.Screen
+              name={Screens.AccountsTransferFrom}
+              component={() => <Accounts onChange={transferForm.selectFrom} />}
+            />
+
+            <Stack.Screen
+              name={Screens.AccountsTransferTo}
+              component={() => <Accounts onChange={transferForm.selectTo} />}
+            />
+
             <Stack.Screen name={Screens.Categories} component={Categories} />
-            <Stack.Screen name={Screens.Accounts} component={Accounts} />
+
             {categoriesScreens.map((cs) => (
               <Stack.Screen
                 key={cs}

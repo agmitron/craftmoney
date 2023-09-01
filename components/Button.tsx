@@ -26,6 +26,7 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
   style,
   variant = "contained",
   size = "small",
+  disabled = false,
   ...props
 }) => {
   const [isActive, setActive] = useState(false);
@@ -33,6 +34,7 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
   const styles = withTheme(theme, variant, size);
 
   const activeStyles = isActive ? styles._active : {};
+  const disabledStyles = disabled ? styles._disabled : {};
 
   return (
     <Pressable
@@ -43,8 +45,10 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
         ...styles[`variant_${variant}`],
         ...styles[`size_${size}`],
         ...activeStyles,
+        ...disabledStyles,
         ...assertStyle(style),
       }}
+      disabled={disabled}
       {...props}
     >
       <Text style={styles.text}>{children}</Text>
@@ -66,6 +70,10 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
     size_large: {},
     _active: {
       opacity: 0.9,
+    },
+    _disabled: {
+      opacity: 0.5,
+      cursor: "not-allowed",
     },
     text: {
       color:

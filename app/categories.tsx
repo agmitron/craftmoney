@@ -35,7 +35,12 @@ const Categories: React.FC = () => {
     return result ?? {};
   });
 
-  const onPress = (category: string) => {
+  const onPress = (category: string, action: "select" | "dive") => {
+    if (action === "select") {
+      selectCategory(category);
+      return navigation.navigate(Screens.Modal as never);
+    }
+
     const nested = _categories[category];
     selectCategory(`${currentCategory}.${category}`);
 
@@ -51,13 +56,18 @@ const Categories: React.FC = () => {
       {currentCategory && (
         <Select
           title={currentCategory}
-          onPress={() => onPress(currentCategory)}
+          onPress={() => onPress(currentCategory, "select")}
           emoji="👍"
         />
       )}
       <View style={styles.separator} />
       {Object.keys(_categories).map((c) => (
-        <Select key={c} title={c} onPress={() => onPress(c)} emoji="👀" />
+        <Select
+          key={c}
+          title={c}
+          onPress={() => onPress(c, "dive")}
+          emoji="👀"
+        />
       ))}
     </View>
   );

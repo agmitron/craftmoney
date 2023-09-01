@@ -23,9 +23,14 @@ import { Theme } from "../constants/theme";
 
 import DatePicker from "~/components/DatePicker";
 import * as form from "~/store/form";
+import { isFailed } from "~/utils/validation";
+
+interface ActionComponentProps {
+  key: string | number;
+}
 
 interface Action {
-  Component: (key: string | number) => React.ReactElement;
+  Component: (props: ActionComponentProps) => React.ReactElement;
 }
 
 // TODO: move to a separate component
@@ -37,6 +42,8 @@ export default function Modal() {
   const category = useStore(form.$category);
   const account = useStore(form.$account);
   const type = useStore(form.$type);
+  const difference = useStore(form.$difference);
+  const isDisabled = useStoreMap(form.$validationResults, isFailed);
 
   const onTypeChange = (newType: form.TransactionType) => {
     if (Platform.OS !== "web") {
@@ -53,7 +60,7 @@ export default function Modal() {
 
         const date = useStoreMap(
           form.$additional,
-          ({ timestamp }) => new Date(timestamp),
+          ({ timestamp }) => new Date(timestamp)
         );
 
         return (
@@ -108,6 +115,7 @@ export default function Modal() {
   const onSubmit = () => {
     form.submit();
     navigation.navigate(Screens.Home as never); // TODO
+    form.reset();
   };
 
   return (
@@ -136,6 +144,7 @@ export default function Modal() {
               returnKeyType="done"
               style={styles.input}
               onChangeText={form.setDifference}
+              value={difference.toString()}
             />
             <View style={styles.types}>
               <Button
@@ -197,13 +206,15 @@ export default function Modal() {
               Additional
             </Typography>
             <Card style={styles.card}>
-              {additionalActions.map((a, i) => a.render(i))}
+              {additionalActions.map(({ Component }, key) => (
+                <Component key={key} />
+              ))}
             </Card>
           </View>
         </ScrollView>
         {!isButtonHidden && (
           <View style={{ paddingHorizontal: 17, paddingBottom: 20 }}>
-            <Button size="large" onPress={onSubmit}>
+            <Button size="large" onPress={onSubmit} disabled={isDisabled}>
               Add
             </Button>
           </View>

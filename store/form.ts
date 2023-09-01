@@ -1,4 +1,4 @@
-import { createEvent, createStore, sample } from "effector";
+import { Store, createEvent, createStore, sample } from "effector";
 
 import { transactions } from "./index";
 import {
@@ -9,7 +9,16 @@ import {
   Transaction,
 } from "./types";
 
-import { Results, Rules, isFailed, isSuccessful } from "~/utils/validation";
+import { NonNullableStructure } from "~/utils/nullable";
+import {
+  Errors,
+  Failed,
+  Results,
+  Rules,
+  isFailed,
+  isSuccessful,
+  preparedRules,
+} from "~/utils/validation";
 
 export enum TransactionType {
   Transfer,
@@ -26,12 +35,28 @@ interface Form {
 }
 
 const rules: Rules<Form> = {
-  account: (value) => value !== null,
-  additional: () => true,
-  category: (value) => value !== null,
+  account: preparedRules.notNull,
+  additional: preparedRules.pass,
+  category: preparedRules.notNull,
   difference: (value) => !isNaN(value),
-  type: () => true,
+  type: preparedRules.notNull,
 };
+
+export const errorsMessages = {
+  account: "Required",
+  additional: "",
+  category: "Required",
+  difference: "Must be numeric",
+  type: "Required",
+};
+
+export const $validationResults = createStore<Results<Form>>({
+  account: false,
+  additional: false,
+  category: false,
+  difference: false,
+  type: false,
+});
 
 export const $category = createStore<Category | null>(null);
 export const $account = createStore<Account | null>(null);
@@ -46,12 +71,15 @@ export const selectType = createEvent<TransactionType>();
 export const setAdditional = createEvent<Omit<Additional, "timestamp">>();
 export const validated = createEvent<Results<Form>>();
 export const submit = createEvent();
+export const reset = createEvent();
 
-$category.on(selectCategory, (_, category) => category);
-$account.on(selectAccount, (_, account) => account);
-$type.on(selectType, (_, type) => type);
-$difference.on(setDifference, (_, difference) => +difference);
-$additional.on(setAdditional, (prev, current) => ({ ...prev, ...current }));
+$category.on(selectCategory, (_, category) => category).reset(reset);
+$account.on(selectAccount, (_, account) => account).reset(reset);
+$type.on(selectType, (_, type) => type).reset(reset);
+$difference.on(setDifference, (_, difference) => +difference).reset(reset);
+$additional
+  .on(setAdditional, (prev, current) => ({ ...prev, ...current }))
+  .reset(reset);
 
 const source = {
   category: $category,
@@ -62,7 +90,7 @@ const source = {
 };
 
 sample({
-  clock: submit,
+  clock: [submit, $account, $additional, $type, $category, $difference],
   source,
   fn: (form) => ({
     // TODO: type-safe loop
@@ -78,17 +106,22 @@ sample({
 // Show error if failed
 sample({
   clock: validated,
-  source,
-  filter: (_, clock) => isFailed(clock),
-  fn: () => {},
+  target: $validationResults,
 });
 
 // Create a transaction otherwise
 sample({
-  clock: validated,
+  clock: $validationResults,
   source,
-  filter: (_, clock) => isSuccessful(clock),
-  fn: ({ account, category, difference, type, additional }): Transaction => {
+  filter: (source, clock): source is NonNullableStructure<Form> =>
+    isSuccessful(clock),
+  fn: ({
+    account,
+    category,
+    difference,
+    type,
+    additional,
+  }: NonNullableStructure<Form>): Transaction => {
     const transaction: Transaction = {
       account: account.id,
       difference: Number(difference), // TODO: validation

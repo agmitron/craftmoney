@@ -10,7 +10,7 @@ import { categories } from "../store";
 import Select from "~/components/Select";
 import { useTheme } from "~/components/Themed";
 import { Theme } from "~/constants/theme";
-import { incomeExpenseForm } from "~/store/form";
+import { incomeExpenseForm } from "~/store/forms/transaction";
 
 const Categories: React.FC = () => {
   const route = useRoute();

@@ -14,7 +14,7 @@ interface Props extends TextInputProps {
   size?: "small" | "medium" | "large";
 }
 
-const Input: React.FC<Props> = ({
+const TextField: React.FC<Props> = ({
   decorations,
   style,
   variant = "filled",
@@ -102,4 +102,4 @@ const withTheme = (t: Theme) =>
     },
   });
 
-export default Input;
+export default TextField;

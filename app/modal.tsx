@@ -8,7 +8,7 @@ import {
 
 import { IncomeExpenseForm, TransferForm } from "./forms";
 
-import { $type, TransactionType } from "~/store/form";
+import { $type, TransactionType } from "~/store/forms/transaction";
 
 // TODO: move to a separate component
 export default function Modal() {

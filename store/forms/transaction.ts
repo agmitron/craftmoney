@@ -6,8 +6,8 @@ import {
   sample,
 } from "effector";
 
-import { transactions } from "./index";
-import { Account, Additional, Category, Transaction } from "./types";
+import { transactions } from "../index";
+import { Account, Additional, Category, Transaction } from "../types";
 
 import { NonNullableStructure } from "~/utils/nullable";
 import {

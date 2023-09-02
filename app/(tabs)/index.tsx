@@ -1,9 +1,12 @@
+import { Link, useNavigation } from "@react-navigation/native";
 import { useStore, useStoreMap } from "effector-react";
 import { StyleSheet, View } from "react-native";
 
-import Card from "../../components/Card";
-import Typography from "../../components/Typography";
-import { accounts, transactions } from "../../store";
+import { Screens } from "~/app/_layout";
+import Button from "~/components/Button";
+import Card from "~/components/Card";
+import Typography from "~/components/Typography";
+import { accounts, transactions } from "~/store";
 
 export default function TabOneScreen() {
   const _accounts = useStore(accounts.$accounts);
@@ -15,19 +18,29 @@ export default function TabOneScreen() {
     }
   );
 
-  console.log({ _accounts, allTransactions });
+  const { navigate } = useNavigation();
 
   return (
     <View style={styles.root}>
       <View style={styles.accounts}>
         {Object.values(_accounts).map((account) => (
-          <Card>
+          <Card style={styles.account}>
             <Typography variant="title">{account.name}</Typography>
             <Typography variant="subtitle">
               {_balances[account.id]} {account.currency}
             </Typography>
           </Card>
         ))}
+        <Card style={styles.account_create}>
+          <Typography variant="title">Create a new account</Typography>
+          <Button
+            variant="contained"
+            style={{ width: "100%" }}
+            onPress={() => navigate(Screens.AccountsCreate as never)}
+          >
+            +
+          </Button>
+        </Card>
       </View>
 
       <View style={styles.transactions}>
@@ -65,6 +78,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 20,
+  },
+  account: {},
+  account_create: {
+    rowGap: 20,
   },
   transactions: {},
 });

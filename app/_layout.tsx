@@ -23,7 +23,9 @@ import { useTheme } from "../components/Themed";
 import { Theme } from "../constants/theme";
 import { categories } from "../store";
 import { flattenCategories } from "../utils/categories";
-import { incomeExpenseForm, transferForm } from "~/store/form";
+
+import { incomeExpenseForm, transferForm } from "~/store/forms/transaction";
+import CreateAccount from "./create-account";
 
 export const Stack = createNativeStackNavigator();
 
@@ -35,6 +37,7 @@ export const enum Screens {
   Accounts = "accounts",
   AccountsTransferTo = "accounts/transfer/to",
   AccountsTransferFrom = "accounts/transfer/from",
+  AccountsCreate = "accounts/create",
 }
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
@@ -121,6 +124,7 @@ const useLinking = (categoriesScreens: string[] = []) => {
           [Screens.Accounts]: "accounts",
           [Screens.AccountsTransferFrom]: "accounts/transfer/from",
           [Screens.AccountsTransferTo]: "accounts/transfer/to",
+          [Screens.AccountsCreate]: "accounts/create",
         } as Record<string, string>,
       },
       prefixes: [],
@@ -192,6 +196,11 @@ function RootLayoutNav() {
             <Stack.Screen
               name={Screens.AccountsTransferTo}
               component={() => <Accounts onChange={transferForm.selectTo} />}
+            />
+
+            <Stack.Screen
+              name={Screens.AccountsCreate}
+              component={CreateAccount}
             />
 
             <Stack.Screen name={Screens.Categories} component={Categories} />

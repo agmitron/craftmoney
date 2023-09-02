@@ -11,7 +11,7 @@ import {
   TransactionType,
   incomeExpenseForm,
   transferForm,
-} from "~/store/form";
+} from "~/store/forms/transaction";
 import { Account } from "~/store/types";
 
 interface Props {

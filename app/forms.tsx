@@ -1,14 +1,15 @@
 import { useNavigation } from "@react-navigation/native";
+import { Store } from "effector";
 import { useStore, useStoreMap } from "effector-react";
 import * as Haptics from "expo-haptics";
 import { useState, useEffect } from "react";
 import { View, Keyboard, Platform, StyleSheet } from "react-native";
 
-import { Screens, Stack } from "./_layout";
-import Accounts from "./accounts";
+import { Screens } from "./_layout";
 
 import Button from "~/components/Button";
 import Card from "~/components/Card";
+import DatePicker from "~/components/DatePicker";
 import Select from "~/components/Select";
 import TextField from "~/components/TextField";
 import { useTheme } from "~/components/Themed";
@@ -21,8 +22,8 @@ import {
   selectType,
   transferForm,
 } from "~/store/forms/transaction";
+import { Additional } from "~/store/types";
 import { isFailed } from "~/utils/validation";
-import DatePicker from "~/components/DatePicker";
 
 interface ActionComponentProps {
   key: string | number;
@@ -33,7 +34,10 @@ interface Action {
 }
 
 // TODO: make dynamic
-const useAdditionalActions = () => {
+const useAdditionalActions = (
+  setAdditional: (value: Omit<Additional, "timestamp">) => void,
+  $additional: Store<Additional>
+) => {
   const theme = useTheme();
   const styles = withTheme(theme);
 
@@ -43,7 +47,7 @@ const useAdditionalActions = () => {
         const [isOpen, setOpen] = useState(false);
 
         const date = useStoreMap(
-          incomeExpenseForm.$additional,
+          $additional,
           ({ timestamp }) => new Date(timestamp)
         );
 
@@ -53,7 +57,7 @@ const useAdditionalActions = () => {
               isOpen={isOpen}
               date={date}
               onConfirm={(date) => {
-                incomeExpenseForm.setAdditional({ timestamp: date.getTime() });
+                setAdditional({ timestamp: date.getTime() });
                 setOpen(false);
               }}
               onCancel={() => setOpen(false)}
@@ -64,6 +68,10 @@ const useAdditionalActions = () => {
     },
     {
       Component: ({ key }) => {
+        const note = useStoreMap($additional, ({ note }) => note);
+
+        console.log({ note });
+
         return (
           <View
             key={key}
@@ -78,7 +86,8 @@ const useAdditionalActions = () => {
               size="small"
               returnKeyLabel="done"
               returnKeyType="done"
-              onChangeText={(note) => incomeExpenseForm.setAdditional({ note })}
+              onChangeText={(note) => setAdditional({ note })}
+              value={note}
             />
           </View>
         );
@@ -98,8 +107,8 @@ export const TransferForm = () => {
   const to = useStore(transferForm.$to);
   const type = useStore($type);
   const amount = useStore(transferForm.$amount);
-  const isDisabled = useStoreMap(transferForm.$validationResults, isFailed);
-  const validationResults = useStore(transferForm.$validationResults);
+  const isDisabled = useStoreMap(transferForm.$validation, isFailed);
+  const validation = useStore(transferForm.$validation);
 
   const onTypeChange = (newType: TransactionType) => {
     if (Platform.OS !== "web") {
@@ -124,7 +133,10 @@ export const TransferForm = () => {
     transferForm.reset();
   };
 
-  const additionalActions = useAdditionalActions();
+  const additionalActions = useAdditionalActions(
+    transferForm.setAdditional,
+    transferForm.$additional
+  );
 
   return (
     <>
@@ -143,7 +155,7 @@ export const TransferForm = () => {
             ),
             right: (
               <>
-                {!validationResults.amount && (
+                {!validation.amount && (
                   <Typography color="red" style={{ marginRight: 20 }}>
                     {transferForm.errorMessages.amount}
                   </Typography>
@@ -196,7 +208,7 @@ export const TransferForm = () => {
           }
           decoration={
             <>
-              {!validationResults.from && (
+              {!validation.from && (
                 <Typography color="red">
                   {transferForm.errorMessages.from}
                 </Typography>
@@ -215,7 +227,7 @@ export const TransferForm = () => {
           }
           decoration={
             <>
-              {!validationResults.to && (
+              {!validation.to && (
                 <Typography color="red">
                   {transferForm.errorMessages.to}
                 </Typography>
@@ -237,7 +249,7 @@ export const TransferForm = () => {
           ))}
         </Card>
       </View>
-      {!validationResults.additional && (
+      {!validation.additional && (
         <Typography color="red">
           {transferForm.errorMessages.additional}
         </Typography>
@@ -263,11 +275,8 @@ export const IncomeExpenseForm = () => {
   const account = useStore(incomeExpenseForm.$account);
   const type = useStore($type);
   const amount = useStore(incomeExpenseForm.$amount);
-  const isDisabled = useStoreMap(
-    incomeExpenseForm.$validationResults,
-    isFailed
-  );
-  const validationResults = useStore(incomeExpenseForm.$validationResults);
+  const isDisabled = useStoreMap(incomeExpenseForm.$validation, isFailed);
+  const validation = useStore(incomeExpenseForm.$validation);
 
   const onTypeChange = (newType: TransactionType) => {
     if (Platform.OS !== "web") {
@@ -276,7 +285,10 @@ export const IncomeExpenseForm = () => {
     selectType(newType);
   };
 
-  const additionalActions = useAdditionalActions();
+  const additionalActions = useAdditionalActions(
+    incomeExpenseForm.setAdditional,
+    incomeExpenseForm.$additional,
+  );
 
   useEffect(() => {
     Keyboard.addListener("keyboardWillShow", () => setButtonHidden(true));
@@ -311,7 +323,7 @@ export const IncomeExpenseForm = () => {
             ),
             right: (
               <>
-                {!validationResults.amount && (
+                {!validation.amount && (
                   <Typography color="red" style={{ marginRight: 20 }}>
                     {incomeExpenseForm.errorsMessages.amount}
                   </Typography>
@@ -362,7 +374,7 @@ export const IncomeExpenseForm = () => {
           }
           decoration={
             <>
-              {!validationResults.category && (
+              {!validation.category && (
                 <Typography color="red">
                   {incomeExpenseForm.errorsMessages.category}
                 </Typography>
@@ -380,7 +392,7 @@ export const IncomeExpenseForm = () => {
           }
           decoration={
             <>
-              {!validationResults.account && (
+              {!validation.account && (
                 <Typography color="red">
                   {incomeExpenseForm.errorsMessages.account}
                 </Typography>
@@ -402,7 +414,7 @@ export const IncomeExpenseForm = () => {
           ))}
         </Card>
       </View>
-      {!validationResults.additional && (
+      {!validation.additional && (
         <Typography color="red">
           {incomeExpenseForm.errorsMessages.additional}
         </Typography>

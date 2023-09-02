@@ -1,15 +1,9 @@
-import {
-  StoreValue,
-  combine,
-  createEvent,
-  createStore,
-  sample,
-} from "effector";
+import { combine, createEvent, createStore, sample } from "effector";
+import { and } from "patronum";
 
 import { transactions } from "../index";
 import { Account, Additional, Category, Transaction } from "../types";
 
-import { NonNullableStructure } from "~/utils/nullable";
 import {
   Results,
   Rules,
@@ -49,7 +43,7 @@ function createIncomeExpenseForm() {
     amount: "Required, must be numeric",
   };
 
-  const $validationResults = createStore<Results<Form>>({
+  const $validation = createStore<Results<Form>>({
     account: false,
     additional: false,
     category: false,
@@ -64,9 +58,9 @@ function createIncomeExpenseForm() {
   const selectCategory = createEvent<string>();
   const selectAccount = createEvent<Account>();
   const setAmount = createEvent<string>();
-
   const setAdditional = createEvent<Omit<Additional, "timestamp">>();
-  const validated = createEvent<Results<Form>>();
+
+  const validate = createEvent();
   const submit = createEvent();
   const reset = createEvent();
 
@@ -78,21 +72,21 @@ function createIncomeExpenseForm() {
     .on(setAdditional, (prev, current) => ({ ...prev, ...current }))
     .reset(reset);
 
-  $validationResults.on(validated, (_, results) => results);
-
-  const source = combine({
+  const $form = combine({
     category: $category,
     account: $account,
     amount: $amount,
-    type: $type,
     additional: $additional,
   });
 
-  type Source = StoreValue<typeof source>;
+  sample({
+    clock: [submit, $account, $additional, $category, $amount],
+    target: validate,
+  });
 
   sample({
-    clock: [submit, $account, $additional, $type, $category, $amount],
-    source,
+    clock: validate,
+    source: $form,
     fn: (form) => ({
       // TODO: type-safe loop
       account: rules.account(form.account),
@@ -100,59 +94,47 @@ function createIncomeExpenseForm() {
       category: rules.category(form.category),
       amount: rules.amount(form.amount),
     }),
-    target: validated,
+    target: $validation,
   });
 
-  // Create a transaction otherwise
-  sample({
-    clock: $validationResults,
-    source,
-    filter: (source, clock): source is NonNullableStructure<Source> =>
-      isSuccessful(clock) && source.type !== TransactionType.Transfer,
-    fn: (form: NonNullableStructure<Source>): Transaction => {
-      const transaction: Transaction = {
-        account: form.account.id,
-        amount: Number(form.amount),
-        category: form.category,
-        additional: form.additional,
-      };
+  const createTransaction = (form: Form, type: TransactionType) => {
+    if (!form.account) {
+      throw new Error(`Invalid account value: ${form.account}`);
+    }
 
-      switch (form.type) {
-        case TransactionType.Expense: {
-          transaction.amount = transaction.amount * -1;
-          return transaction;
-        }
-        case TransactionType.Income: {
-          return transaction;
-        }
-        default: {
-          throw new Error(`Unhandled transaction type: ${form.type}`);
-        }
-      }
-    },
+    if (!form.category) {
+      throw new Error(`Invalid category value: ${form.category}`);
+    }
+
+    const transaction: Transaction = {
+      account: form.account.id,
+      amount: Number(form.amount),
+      category: form.category,
+      additional: form.additional,
+    };
+
+    if (type === TransactionType.Expense) {
+      transaction.amount = transaction.amount * -1;
+    }
+
+    return transaction;
+  };
+
+  sample({
+    clock: submit,
+    source: { form: $form, type: $type },
+    filter: and(
+      $validation.map(isSuccessful),
+      $type.map((t) => t !== TransactionType.Transfer)
+    ),
+    fn: ({ form, type }) => createTransaction(form, type),
     target: transactions.create,
-  });
-
-  // If the transfer type is chosen
-  sample({
-    clock: $validationResults,
-    source,
-    filter: (source, clock): source is NonNullableStructure<Source> =>
-      isSuccessful(clock) && source.type === TransactionType.Transfer,
-    fn: (form: NonNullableStructure<Source>): Transaction => {
-      return {
-        account: form.account.id,
-        amount: Number(form.amount),
-        category: form.category,
-        additional: form.additional,
-      };
-    },
   });
 
   return {
     rules,
     errorsMessages,
-    $validationResults,
+    $validation,
     $category,
     $account,
     $amount,
@@ -161,7 +143,6 @@ function createIncomeExpenseForm() {
     selectCategory,
     setAmount,
     setAdditional,
-    validated,
     submit,
     reset,
   };
@@ -190,7 +171,7 @@ function createTransferForm() {
     from: $from,
     to: $to,
   });
-  const $validationResults = createStore<Results<Form>>({
+  const $validation = createStore<Results<Form>>({
     additional: false,
     amount: false,
     from: false,
@@ -209,8 +190,7 @@ function createTransferForm() {
   const setAmount = createEvent<string>();
   const setAdditional = createEvent<Omit<Additional, "timestamp">>();
   const submit = createEvent();
-  const startValidation = createEvent();
-  const validationCompleted = createEvent<Results<Form>>();
+  const validate = createEvent();
   const reset = createEvent();
 
   $from.on(selectFrom, (_, account) => account);
@@ -221,15 +201,13 @@ function createTransferForm() {
     ...current,
   }));
 
-  const $isValidationSuccessful = $validationResults.map(isSuccessful);
-
   sample({
     clock: [$from, $to, $amount, $additional, submit],
-    target: startValidation,
+    target: validate,
   });
 
   sample({
-    clock: startValidation,
+    clock: validate,
     source: {
       from: $from,
       to: $to,
@@ -244,12 +222,7 @@ function createTransferForm() {
         to: rules.to(form.to),
       };
     },
-    target: validationCompleted,
-  });
-
-  sample({
-    clock: validationCompleted,
-    target: $validationResults,
+    target: $validation,
   });
 
   sample({
@@ -260,13 +233,27 @@ function createTransferForm() {
       additional: $additional,
       amount: $amount,
     },
-    filter: $isValidationSuccessful,
-    fn: (form) => ({ // TODO: typings issues
-      from: form.from.id,
-      to: form.to.id,
-      amount: form.amount,
-      additional: form.additional,
-    }),
+    filter: $validation.map(isSuccessful),
+    fn: (form) => {
+      if (!form.from) {
+        throw new Error(
+          `Account from money must be transfered has not been specified`
+        );
+      }
+
+      if (!form.to) {
+        throw new Error(
+          `Account to money must be transfered has not been specified`
+        );
+      }
+
+      return {
+        from: form.from.id,
+        to: form.to.id,
+        amount: Number(form.amount),
+        additional: form.additional,
+      };
+    },
     target: transactions.transfer,
   });
 
@@ -275,7 +262,7 @@ function createTransferForm() {
     $to,
     $amount,
     $additional,
-    $validationResults,
+    $validation,
     selectFrom,
     selectTo,
     setAmount,

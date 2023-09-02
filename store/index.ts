@@ -110,4 +110,20 @@ sample({
   target: transactions.$transactions,
 });
 
+sample({
+  clock: transactions.transfer,
+  source: accounts.$balances,
+  fn: (balances, tx) => {
+    const prevBalanceTo = balances[tx.to] ?? 0;
+    const prevBalanceFrom = balances[tx.from] ?? 0;
+
+    return {
+      ...balances,
+      [tx.from]: prevBalanceFrom - tx.amount,
+      [tx.to]: prevBalanceTo + tx.amount,
+    };
+  },
+  target: accounts.$balances,
+});
+
 export { accounts, transactions, categories };

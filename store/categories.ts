@@ -1,5 +1,5 @@
 import { persist } from "@effector-storage/react-native-async-storage";
-import { createStore } from "effector";
+import { createEvent, createStore } from "effector";
 
 import { Categories } from "./types";
 
@@ -28,3 +28,7 @@ export const $categories = createStore<Categories>({
 });
 
 persist({ store: $categories, key: "$categories" });
+
+export const reset = createEvent();
+
+$categories.reset(reset);

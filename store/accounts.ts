@@ -5,9 +5,9 @@ import _ from "lodash";
 import { Account, AccountID, Accounts, Balances } from "./types";
 
 export const $accounts = createStore<Accounts>({
-  0: { currency: "THB", name: "THB", id: "0" },
-  1: { currency: "USD", name: "USD", id: "1" },
-  2: { currency: "RUB", name: "RUB", id: "2" },
+  // 0: { currency: "THB", name: "THB", id: "0" },
+  // 1: { currency: "USD", name: "USD", id: "1" },
+  // 2: { currency: "RUB", name: "RUB", id: "2" },
 });
 persist({ store: $accounts, key: "$accounts" });
 export const $balances = createStore<Balances>({});

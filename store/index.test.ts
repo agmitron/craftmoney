@@ -75,3 +75,70 @@ describe("Accounts", () => {
     expect(_.size(accounts.$accounts.getState())).toBe(0);
   });
 });
+
+describe("Transactions", () => {
+  test("Reset states", () => {
+    accounts.reset();
+    expect(_.size(accounts.$accounts.getState())).toBe(0);
+
+    transactions.reset();
+    expect(_.size(transactions.$transactions.getState())).toBe(0);
+  });
+
+  test("Create a new USD account", () => {
+    accounts.create({ currency: "USD", name: "USD" });
+    expect(_.size(accounts.$accounts.getState())).toBe(1);
+    expect(accounts.$accounts.getState()[0]).toEqual({
+      id: "0",
+      currency: "USD",
+      name: "USD",
+    });
+  });
+
+  test("Buy groceries", () => {
+    transactions.create({
+      account: "0",
+      additional: { timestamp: Date.now() },
+      amount: -15,
+      category: "Groceries",
+    });
+
+    expect(_.size(transactions.$transactions.getState()["0"])).toBe(1);
+    expect(accounts.$balances.getState()["0"]).toBe(-15);
+  });
+
+  test("Get a salary", () => {
+    transactions.create({
+      account: "0",
+      additional: { timestamp: Date.now() },
+      amount: 150,
+      category: "Salary",
+    });
+    expect(accounts.$balances.getState()["0"]).toBe(135);
+    expect(_.size(transactions.$transactions.getState()["0"])).toBe(2);
+  });
+
+  test("Transfer the money", () => {
+    const wifeAccount = accounts.create({
+      currency: "USD",
+      name: "USD (Wife)",
+    });
+
+    expect(_.size(accounts.$accounts.getState())).toBe(2);
+    expect(accounts.$accounts.getState()["1"]).toEqual({
+      id: "1",
+      name: wifeAccount.name,
+      currency: wifeAccount.currency,
+    });
+
+    transactions.transfer({
+      from: "0",
+      to: "1",
+      additional: { timestamp: Date.now() },
+      amount: 50,
+    });
+
+    expect(accounts.$balances.getState()["0"]).toBe(85);
+    expect(accounts.$balances.getState()["1"]).toBe(50);
+  });
+});

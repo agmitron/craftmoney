@@ -19,11 +19,13 @@ export const transfer = createEvent<{
   amount: Amount;
   additional: Additional;
 }>();
+export const reset = createEvent();
 
 export const getAccountTransactions = (
   allTransactions: Transactions,
-  account: AccountID
+  account: AccountID,
 ): Transaction[] => {
   return allTransactions[account] ?? [];
 };
 
+$transactions.reset(reset);

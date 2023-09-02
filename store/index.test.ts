@@ -1,7 +1,7 @@
 import { expect, test } from "@jest/globals";
 import _ from "lodash";
 
-import { accounts, transactions } from "./index";
+import { accounts, categories, transactions } from "./index";
 import { Account } from "./types";
 
 describe("Accounts", () => {
@@ -140,5 +140,63 @@ describe("Transactions", () => {
 
     expect(accounts.$balances.getState()["0"]).toBe(85);
     expect(accounts.$balances.getState()["1"]).toBe(50);
+  });
+});
+
+describe("Categories", () => {
+  test("Create a category", () => {
+    const initialCategories = {
+      food: {
+        restaurants: {
+          kfc: null,
+          mcdonalds: null,
+        },
+      },
+      investments: {
+        crypto: {
+          altcoins: null,
+          web3: null,
+          gamefi: null,
+        },
+        stocks: {
+          snp500: null,
+          etf: null,
+        },
+      },
+    };
+    expect(categories.$categories.getState()).toEqual(initialCategories);
+
+    categories.create({ name: "Taco Bell", parent: "food.restaurants" });
+    expect(categories.$categories.getState()).not.toEqual(initialCategories);
+    expect(categories.$categories.getState()).not.toBe(null);
+    expect(
+      categories.$categories.getState()?.food?.restaurants?.["Taco Bell"]
+    ).not.toBeUndefined();
+    expect(
+      categories.$categories.getState()?.food?.restaurants?.["Taco Bell"]
+    ).toBe(null);
+  });
+
+  test("Remove a category", () => {
+    categories.remove(["food.restaurants.Taco Bell", "food.restaurants.kfc"]);
+
+    expect(
+      _.get(categories.$categories.getState(), "food.restaurants")
+    ).toEqual({ mcdonalds: null });
+  });
+
+  test("Update a category", () => {
+    categories.update({
+      previous: "investments.crypto.gamefi",
+      current: "investments.crypto.Web3 Games",
+    });
+
+    expect(
+      _.get(categories.$categories.getState(), "investments.crypto")
+    ).toEqual({
+      altcoins: null,
+      web3: null,
+      "Web3 Games": null,
+    });
   });
 });

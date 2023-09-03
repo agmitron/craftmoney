@@ -1,17 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
-import { useStore, useStoreMap } from "effector-react";
+import { useStoreMap } from "effector-react";
 import { View } from "react-native";
 
 import { Screens } from "./_layout";
 import { accounts } from "../store";
 
 import Select from "~/components/Select";
-import {
-  $type,
-  TransactionType,
-  incomeExpenseForm,
-  transferForm,
-} from "~/store/forms/transaction";
+import { incomeExpenseForm } from "~/store/forms/transaction";
 import { Account } from "~/store/types";
 
 interface Props {
@@ -28,7 +23,7 @@ const Accounts: React.FC<Props> = ({
 
   const onPress = (account: Account) => {
     onChange(account);
-    navigation.navigate(Screens.Modal as never);
+    navigation.navigate(Screens.TransactionsCreate as never);
   };
 
   return (

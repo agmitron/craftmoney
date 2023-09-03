@@ -1,6 +1,6 @@
 import { Link, useNavigation } from "@react-navigation/native";
 import { useStore, useStoreMap } from "effector-react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
 import { Screens } from "~/app/_layout";
@@ -23,12 +23,19 @@ export default function TabOneScreen() {
     <View style={styles.root}>
       <View style={styles.accounts}>
         {Object.values(_accounts).map((account, key) => (
-          <Card style={styles.account} key={key}>
-            <Typography variant="title">{account.name}</Typography>
-            <Typography variant="subtitle">
-              {_balances[account.id]} {account.currency}
-            </Typography>
-          </Card>
+          <Pressable
+            key={key}
+            onPress={() =>
+              navigate(...([`accounts/edit`, { id: account.id }] as never))
+            }
+          >
+            <Card style={styles.account}>
+              <Typography variant="title">{account.name}</Typography>
+              <Typography variant="subtitle">
+                {_balances[account.id]} {account.currency}
+              </Typography>
+            </Card>
+          </Pressable>
         ))}
         <Card style={styles.account_create}>
           <Typography variant="title">Create a new account</Typography>

@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { Link, useNavigation, useRoute } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
 import _ from "lodash";
 import { useMemo } from "react";
@@ -11,6 +11,8 @@ import Select from "~/components/Select";
 import { useTheme } from "~/components/Themed";
 import { Theme } from "~/constants/theme";
 import { incomeExpenseForm } from "~/store/forms/transaction";
+import CreateCategory from "./categories.create";
+import Button from "~/components/Button";
 
 const Categories: React.FC = () => {
   const route = useRoute();
@@ -38,7 +40,7 @@ const Categories: React.FC = () => {
   const onPress = (category: string, action: "select" | "dive") => {
     if (action === "select") {
       incomeExpenseForm.selectCategory(category);
-      return navigation.navigate(Screens.Modal as never);
+      return navigation.navigate(Screens.TransactionsCreate as never);
     }
 
     const nested = _categories[category];
@@ -48,11 +50,18 @@ const Categories: React.FC = () => {
       return navigation.navigate(`${route.name}/${category}` as never); // TODO
     }
 
-    return navigation.navigate(Screens.Modal as never);
+    return navigation.navigate(Screens.TransactionsCreate as never);
+  };
+
+  const createCategory = () => {
+    navigation.navigate(
+      ...([Screens.CategoriesCreate, { parent: currentCategory }] as never)
+    ); // TODO
   };
 
   return (
     <View>
+      <Button onPress={createCategory}>Create</Button>
       {currentCategory && (
         <Select
           title={currentCategory}

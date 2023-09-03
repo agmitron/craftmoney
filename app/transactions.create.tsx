@@ -3,7 +3,15 @@ import { Store } from "effector";
 import { useStore, useStoreMap } from "effector-react";
 import * as Haptics from "expo-haptics";
 import { useState, useEffect } from "react";
-import { View, Keyboard, Platform, StyleSheet } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  View,
+  Keyboard,
+  StyleSheet,
+} from "react-native";
 
 import { Screens } from "./_layout";
 
@@ -287,7 +295,7 @@ export const IncomeExpenseForm = () => {
 
   const additionalActions = useAdditionalActions(
     incomeExpenseForm.setAdditional,
-    incomeExpenseForm.$additional,
+    incomeExpenseForm.$additional
   );
 
   useEffect(() => {
@@ -482,3 +490,27 @@ const withTheme = (t: Theme) =>
       borderBottomWidth: 0,
     },
   });
+
+const CreateTransaction = () => {
+  const type = useStore($type);
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={100}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView>
+          {type === TransactionType.Transfer ? (
+            <TransferForm />
+          ) : (
+            <IncomeExpenseForm />
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
+  );
+};
+
+export default CreateTransaction;

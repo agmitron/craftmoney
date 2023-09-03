@@ -1,6 +1,8 @@
 import { combine, createEvent, createStore, sample } from "effector";
+import { reset } from "patronum";
 
-import * as accounts from "~/store/accounts";
+import { categories } from "..";
+
 import {
   Results,
   Rules,
@@ -9,37 +11,40 @@ import {
 } from "~/utils/validation";
 
 interface Form {
+  parent: string;
   name: string;
-  currency: string;
 }
 
+const rules: Rules<Form> = {
+  parent: preparedRules.notEmptyString,
+  name: preparedRules.notEmptyString,
+};
+
+export const $parent = createStore<string>("");
 export const $name = createStore<string>("");
-export const $currency = createStore<string>("");
 export const $validation = createStore<Results<Form>>({
-  currency: false,
+  parent: false,
   name: false,
 });
 
 export const $form = combine({
+  parent: $parent,
   name: $name,
-  currency: $currency,
 });
 
+export const setParent = createEvent<string>();
 export const setName = createEvent<string>();
-export const setCurrency = createEvent<string>();
 export const submit = createEvent();
 export const validate = createEvent();
+export const clear = createEvent();
 
-$name.on(setName, (_, name) => name);
-$currency.on(setCurrency, (_, currency) => currency);
+$parent.on(setParent, (_, name) => name);
+$name.on(setName, (_, currency) => currency);
 
-const rules: Rules<Form> = {
-  currency: preparedRules.pass,
-  name: preparedRules.pass,
-};
+reset({ clock: clear, target: [$parent, $name] });
 
 sample({
-  clock: [$name, $currency, submit],
+  clock: [$parent, $name, submit],
   target: validate,
 });
 
@@ -47,8 +52,8 @@ sample({
   clock: validate,
   source: $form,
   fn: (form) => ({
+    parent: rules.parent(form.parent),
     name: rules.name(form.name),
-    currency: rules.currency(form.currency),
   }),
   target: $validation,
 });
@@ -57,6 +62,6 @@ sample({
   clock: submit,
   source: $form,
   filter: $validation.map(isSuccessful),
-  fn: (form) => ({ currency: form.currency, name: form.name }),
-  target: accounts.create,
+  fn: (form) => ({ parent: form.parent, name: form.name }),
+  target: categories.create,
 });

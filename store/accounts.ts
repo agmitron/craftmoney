@@ -18,10 +18,23 @@ export const remove = createEvent<AccountID>();
 export const reset = createEvent();
 export const update = createEvent<{
   id: AccountID;
-  account: Partial<Account>;
+  upd: Partial<Account>;
 }>();
 
 export const generateAccountID = (accounts: Accounts): AccountID =>
   _.size(accounts).toString();
 
 $accounts.reset(reset);
+
+$accounts.on(update, (accounts, { id, upd }) => {
+  const previousAccount = accounts[id];
+  return {
+    ...accounts,
+    [id]: {
+      ...previousAccount,
+      ...upd,
+    },
+  };
+});
+
+$accounts.on(remove, (accounts, id) => _.omit(accounts, id));

@@ -16,29 +16,38 @@ import { StyleSheet, Text, View, useColorScheme } from "react-native";
 import TabOneScreen from "./(tabs)";
 import TabTwoScreen from "./(tabs)/two";
 import Accounts from "./accounts";
+import CreateAccount from "./accounts.create";
+import EditAccount from "./accounts.edit";
 import Categories from "./categories";
-import Modal from "./modal";
-import { Header as ModalHeader } from "../components/Modal";
+import CreateCategory from "./categories.create";
+import CreateTransaction from "./transactions.create";
 import { useTheme } from "../components/Themed";
 import { Theme } from "../constants/theme";
 import { categories } from "../store";
 import { flattenCategories } from "../utils/categories";
 
 import { incomeExpenseForm, transferForm } from "~/store/forms/transaction";
-import CreateAccount from "./create-account";
-
-export const Stack = createNativeStackNavigator();
+import { AccountID, Category } from "~/store/types";
 
 export const enum Screens {
   Home = "home",
   Second = "second",
-  Modal = "modal",
+  TransactionsCreate = "transactions/create",
   Categories = "categories",
+  CategoriesCreate = "categories/create",
   Accounts = "accounts",
   AccountsTransferTo = "accounts/transfer/to",
   AccountsTransferFrom = "accounts/transfer/from",
   AccountsCreate = "accounts/create",
+  AccountsEdit = "accounts/edit",
 }
+
+export type RootStackParamList = {
+  [Screens.AccountsEdit]: { id: AccountID };
+  [Screens.CategoriesCreate]: { parent: Category };
+};
+
+export const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
 
@@ -77,7 +86,7 @@ export const Tabs = () => {
       </Link>
       {/* TODO: Typings */}
       <Link
-        to={{ screen: Screens.Modal as "modal" }}
+        to={{ screen: Screens.TransactionsCreate as "transactions/create" }}
         style={[styles.navbar__button, styles.navbar__button_icon]}
       >
         <Text>+</Text>
@@ -94,7 +103,7 @@ export const Tabs = () => {
 };
 
 function useTabs<T>(
-  Component: () => React.ReactElement
+  Component: () => React.ReactElement,
 ): (props: T) => React.ReactElement {
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -118,7 +127,7 @@ const useLinking = (categoriesScreens: string[] = []) => {
       config: {
         screens: {
           [Screens.Home]: "/",
-          [Screens.Modal]: "/modal",
+          [Screens.TransactionsCreate]: "transactions/create",
           [Screens.Second]: "two",
           [Screens.Categories]: "categories",
           [Screens.Accounts]: "accounts",
@@ -147,7 +156,7 @@ function RootLayoutNav() {
   const styles = withTheme(theme);
 
   const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/"))
+    Object.keys(flattenCategories(categories, "", {}, "/")),
   );
 
   const linking = useLinking(categoriesScreens);
@@ -173,12 +182,11 @@ function RootLayoutNav() {
               component={tabTwo}
             />
             <Stack.Screen
-              name={Screens.Modal}
+              name={Screens.TransactionsCreate}
               options={{
                 presentation: "modal",
-                header: () => <ModalHeader text="Add operation" />,
               }}
-              component={Modal}
+              component={CreateTransaction}
             />
 
             <Stack.Screen
@@ -203,7 +211,13 @@ function RootLayoutNav() {
               component={CreateAccount}
             />
 
+            <Stack.Screen name={Screens.AccountsEdit} component={EditAccount} />
+
             <Stack.Screen name={Screens.Categories} component={Categories} />
+            <Stack.Screen
+              name={Screens.CategoriesCreate}
+              component={CreateCategory}
+            />
 
             {categoriesScreens.map((cs) => (
               <Stack.Screen

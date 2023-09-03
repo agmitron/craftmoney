@@ -5,8 +5,10 @@ export type Additional = {
   timestamp: number;
   [key: string]: any;
 };
+export type TransactionID = string;
 
 export interface Transaction {
+  id: TransactionID;
   amount: Amount;
   category: Category;
   account: AccountID;

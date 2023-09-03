@@ -12,20 +12,30 @@ import {
 export const $transactions = createStore<Transactions>({});
 persist({ store: $transactions, key: "$transactions" });
 
-export const create = createEvent<Transaction>();
+export const create = createEvent<Omit<Transaction, "id">>();
 export const transfer = createEvent<{
   from: AccountID;
   to: AccountID;
   amount: Amount;
   additional: Additional;
 }>();
+export const remove = createEvent<Pick<Transaction, "id" | "account">>();
 export const reset = createEvent();
 
 export const getAccountTransactions = (
   allTransactions: Transactions,
-  account: AccountID,
+  account: AccountID
 ): Transaction[] => {
   return allTransactions[account] ?? [];
 };
 
 $transactions.reset(reset);
+
+$transactions.on(remove, (previous, tx) => ({
+  ...previous,
+  [tx.account]: previous[tx.account]?.filter(({ id }) => id !== tx.id) ?? [],
+}));
+
+remove.watch(console.log);
+
+$transactions.watch(console.log);

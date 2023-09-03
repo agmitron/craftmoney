@@ -68,9 +68,13 @@ sample({
   clock: transactions.create,
   source: transactions.$transactions,
   fn: (previous, tx) => {
+    const previousTransactions = transactions.getAccountTransactions(
+      previous,
+      tx.account
+    );
     const newTransactions = [
-      ...transactions.getAccountTransactions(previous, tx.account),
-      tx,
+      ...previousTransactions,
+      { ...tx, id: previousTransactions.length.toString() },
     ];
 
     return {
@@ -85,24 +89,29 @@ sample({
   clock: transactions.transfer,
   source: transactions.$transactions,
   fn: (previous, tx) => {
+    const previousFrom = transactions.getAccountTransactions(previous, tx.from);
+    const previousTo = transactions.getAccountTransactions(previous, tx.to);
+
     return {
       ...previous,
       [tx.from]: [
-        ...transactions.getAccountTransactions(previous, tx.from),
+        ...previousFrom,
         {
           account: tx.from,
           additional: tx.additional,
           amount: tx.amount * -1,
           category: categories.SystemCategories.Transfer,
+          id: previousFrom.length.toString(),
         },
       ],
       [tx.to]: [
-        ...transactions.getAccountTransactions(previous, tx.to),
+        ...previousTo,
         {
           account: tx.to,
           additional: tx.additional,
           amount: tx.amount,
           category: categories.SystemCategories.Transfer,
+          id: previousTo.length.toString(),
         },
       ],
     };

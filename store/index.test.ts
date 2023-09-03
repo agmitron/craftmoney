@@ -141,6 +141,17 @@ describe("Transactions", () => {
     expect(accounts.$balances.getState()["0"]).toBe(85);
     expect(accounts.$balances.getState()["1"]).toBe(50);
   });
+
+  test("Remove a transaction", () => {
+    expect(transactions.$transactions.getState()["1"].length).toBe(1);
+
+    transactions.remove({
+      id: "0",
+      account: "1",
+    });
+
+    expect(transactions.$transactions.getState()["1"].length).toBe(0);
+  });
 });
 
 describe("Categories", () => {

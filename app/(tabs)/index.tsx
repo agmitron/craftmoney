@@ -1,6 +1,7 @@
 import { Link, useNavigation } from "@react-navigation/native";
 import { useStore, useStoreMap } from "effector-react";
 import { StyleSheet, View } from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 
 import { Screens } from "~/app/_layout";
 import Button from "~/components/Button";
@@ -13,9 +14,7 @@ export default function TabOneScreen() {
   const _balances = useStore(accounts.$balances);
   const allTransactions = useStoreMap(
     transactions.$transactions,
-    (transactions) => {
-      return Object.values(transactions).flat();
-    }
+    (transactions) => Object.values(transactions).flat()
   );
 
   const { navigate } = useNavigation();
@@ -23,8 +22,8 @@ export default function TabOneScreen() {
   return (
     <View style={styles.root}>
       <View style={styles.accounts}>
-        {Object.values(_accounts).map((account) => (
-          <Card style={styles.account}>
+        {Object.values(_accounts).map((account, key) => (
+          <Card style={styles.account} key={key}>
             <Typography variant="title">{account.name}</Typography>
             <Typography variant="subtitle">
               {_balances[account.id]} {account.currency}
@@ -44,14 +43,21 @@ export default function TabOneScreen() {
       </View>
 
       <View style={styles.transactions}>
-        {allTransactions.map(({ account, amount, category }) => (
-          <Card>
-            <Typography variant="title">{category}</Typography>
-            <Typography variant="subtitle">
-              {_accounts[account].name}
-            </Typography>
-            <Typography variant="text">{amount}</Typography>
-          </Card>
+        {allTransactions.map((tx) => (
+          <Swipeable
+            key={tx.id}
+            renderRightActions={() => (
+              <Button onPress={() => transactions.remove(tx)}>Delete</Button>
+            )}
+          >
+            <Card>
+              <Typography variant="title">{tx.category}</Typography>
+              <Typography variant="subtitle">
+                {_accounts[tx.account].name}
+              </Typography>
+              <Typography variant="text">{tx.amount}</Typography>
+            </Card>
+          </Swipeable>
         ))}
       </View>
     </View>

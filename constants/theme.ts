@@ -10,8 +10,12 @@ export interface Theme {
     };
   };
   borderRadius: number;
+  layout: {
+    plates: number;
+  };
 }
 
+// TODO: make dynamic
 const themes: Record<"light" | "dark", Theme> = {
   light: {
     colors: {
@@ -25,6 +29,9 @@ const themes: Record<"light" | "dark", Theme> = {
       },
     },
     borderRadius: 10,
+    layout: {
+      plates: 4,
+    },
   },
   dark: {
     // TODO
@@ -39,6 +46,9 @@ const themes: Record<"light" | "dark", Theme> = {
       },
     },
     borderRadius: 10,
+    layout: {
+      plates: 4,
+    },
   },
 };
 

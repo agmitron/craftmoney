@@ -29,6 +29,7 @@
     "expo-system-ui": "~2.4.0",
     "expo-web-browser": "~12.3.2",
     "lodash": "^4.17.21",
+    "nanoid": "^4.0.2",
     "patronum": "^1.17.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

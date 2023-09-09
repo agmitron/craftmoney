@@ -166,7 +166,7 @@ function createTransferForm() {
   const $from = createStore<Account | null>(null);
   const $to = createStore<Account | null>(null);
   const $amount = createStore<string>("");
-  const $additional = combine<Additional>({
+  const $additional = createStore<Additional>({
     timestamp: Date.now(),
     from: $from,
     to: $to,

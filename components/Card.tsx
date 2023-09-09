@@ -8,17 +8,15 @@ interface Props {
 }
 
 const Card: React.FC<PropsWithChildren<Props>> = ({ children, style }) => {
-  return (
-    <View style={{ ...styles.root, ...assertStyle(style) }}>{children}</View>
-  );
+  return <View style={[styles.root, assertStyle(style)]}>{children}</View>;
 };
 
 const styles = StyleSheet.create({
   root: {
     backgroundColor: "white",
     borderRadius: 12,
-    paddingVertical: 24,
-    paddingHorizontal: 28,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
   },
 });
 

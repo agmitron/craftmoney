@@ -1,9 +1,8 @@
-import { Link, useNavigation } from "@react-navigation/native";
 import { useStore, useStoreMap } from "effector-react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
-import { Screens } from "~/app/_layout";
+import AccountsWidget from "~/components/AccountsWidget";
 import Button from "~/components/Button";
 import Card from "~/components/Card";
 import Typography from "~/components/Typography";
@@ -11,42 +10,15 @@ import { accounts, transactions } from "~/store";
 
 export default function TabOneScreen() {
   const _accounts = useStore(accounts.$accounts);
-  const _balances = useStore(accounts.$balances);
   const allTransactions = useStoreMap(
     transactions.$transactions,
     (transactions) => Object.values(transactions).flat()
   );
 
-  const { navigate } = useNavigation();
-
   return (
     <View style={styles.root}>
       <View style={styles.accounts}>
-        {Object.values(_accounts).map((account, key) => (
-          <Pressable
-            key={key}
-            onPress={() =>
-              navigate(...([`accounts/edit`, { id: account.id }] as never))
-            }
-          >
-            <Card style={styles.account}>
-              <Typography variant="title">{account.name}</Typography>
-              <Typography variant="subtitle">
-                {_balances[account.id]} {account.currency}
-              </Typography>
-            </Card>
-          </Pressable>
-        ))}
-        <Card style={styles.account_create}>
-          <Typography variant="title">Create a new account</Typography>
-          <Button
-            variant="contained"
-            style={{ width: "100%" }}
-            onPress={() => navigate(Screens.AccountsCreate as never)}
-          >
-            +
-          </Button>
-        </Card>
+        <AccountsWidget />
       </View>
 
       <View style={styles.transactions}>
@@ -76,6 +48,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
+    padding: 20,
   },
   title: {
     fontSize: 20,
@@ -91,10 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 20,
-  },
-  account: {},
-  account_create: {
-    rowGap: 20,
+    width: "100%",
   },
   transactions: {},
 });

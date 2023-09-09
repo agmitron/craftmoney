@@ -1,7 +1,9 @@
 import { sample } from "effector";
 import _ from "lodash";
+import { nanoid } from "nanoid";
 
 import * as accounts from "./accounts";
+import * as appearance from "./appearance";
 import * as categories from "./categories";
 import * as transactions from "./transactions";
 
@@ -9,16 +11,24 @@ sample({
   clock: accounts.create,
   source: accounts.$accounts,
   fn: (previousAccounts, newAccount) => {
-    const id = accounts.generateAccountID(previousAccounts);
     return {
       ...previousAccounts,
-      [id]: {
+      [newAccount.id]: {
         ...newAccount,
-        id,
       },
     };
   },
   target: accounts.$accounts,
+});
+
+sample({
+  clock: accounts.create,
+  source: appearance.$emoji,
+  fn: (emoji, account) => ({
+    ...emoji,
+    accounts: { ...emoji.accounts, [account.id]: account.emoji },
+  }),
+  target: appearance.$emoji,
 });
 
 sample({
@@ -31,9 +41,9 @@ sample({
 sample({
   clock: accounts.update,
   source: accounts.$accounts,
-  fn: (accounts, { id, account }) => {
+  fn: (accounts, { id, upd }) => {
     const previousAccount = accounts[id];
-    const newAccount = { ...previousAccount, ...account };
+    const newAccount = { ...previousAccount, ...upd };
     return { ...accounts, [id]: newAccount };
   },
   target: accounts.$accounts,
@@ -48,7 +58,7 @@ sample({
         ...accumulator,
         [accountID]: balances[accountID] ?? 0,
       }),
-      {}
+      {},
     ),
   target: accounts.$balances,
 });
@@ -70,7 +80,7 @@ sample({
   fn: (previous, tx) => {
     const previousTransactions = transactions.getAccountTransactions(
       previous,
-      tx.account
+      tx.account,
     );
     const newTransactions = [
       ...previousTransactions,
@@ -135,4 +145,8 @@ sample({
   target: accounts.$balances,
 });
 
-export { accounts, transactions, categories };
+accounts.create({ currency: "THB", name: "THB", emoji: "🇹🇭", id: nanoid() });
+accounts.create({ currency: "USD", name: "USD", emoji: "🇺🇸", id: nanoid() });
+accounts.create({ currency: "RUB", name: "RUB", emoji: "🇷🇺", id: nanoid() });
+
+export { accounts, transactions, categories, appearance };

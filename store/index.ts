@@ -1,10 +1,10 @@
 import { sample } from "effector";
 import _ from "lodash";
-import { nanoid } from "nanoid";
 
 import * as accounts from "./accounts";
 import * as appearance from "./appearance";
 import * as categories from "./categories";
+import * as currencies from "./currencies";
 import * as transactions from "./transactions";
 
 sample({
@@ -145,8 +145,10 @@ sample({
   target: accounts.$balances,
 });
 
-accounts.create({ currency: "THB", name: "THB", emoji: "🇹🇭", id: nanoid() });
-accounts.create({ currency: "USD", name: "USD", emoji: "🇺🇸", id: nanoid() });
-accounts.create({ currency: "RUB", name: "RUB", emoji: "🇷🇺", id: nanoid() });
+// accounts.create({ currency: "USD", name: "USD", emoji: "🇺🇸", id: nanoid() });
+// accounts.create({ currency: "THB", name: "THB", emoji: "🇹🇭", id: nanoid() });
+// accounts.create({ currency: "RUB", name: "RUB", emoji: "🇷🇺", id: nanoid() });
 
-export { accounts, transactions, categories, appearance };
+currencies.requestRates();
+
+export { accounts, transactions, categories, appearance, currencies };

@@ -7,3 +7,9 @@ export function formatDateToISOString(date: Date) {
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
+
+export function getDifference(a: Date, b: Date) {
+  return a.getTime() - b.getTime();
+}
+
+export const DAY = 1000 * 3600 * 24;

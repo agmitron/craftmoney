@@ -164,7 +164,24 @@ namespace Views {
               onPress={create}
               style={{ marginTop: "auto", marginBottom: "auto" }}
             >
-              +
+              <View
+                style={{
+                  position: "absolute",
+                  backgroundColor: "white",
+                  width: 22,
+                  height: 3,
+                  borderRadius: 3,
+                }}
+              />
+              <View
+                style={{
+                  position: "absolute",
+                  backgroundColor: "white",
+                  width: 3,
+                  height: 22,
+                  borderRadius: 3,
+                }}
+              />
             </Button>
             <Typography variant="subtitle">Add account</Typography>
           </CardComponent>
@@ -213,13 +230,14 @@ const withTheme = (t: Theme) =>
   StyleSheet.create({
     container: {
       width: "100%",
+      marginHorizontal: "auto",
     },
     container_card: {},
     container_plates: {
       display: "flex",
       flexWrap: "wrap",
       flexDirection: "row",
-      // justifyContent: "space-around",
+      justifyContent: "space-between",
       rowGap: 15,
       columnGap: 5,
     },

@@ -78,8 +78,6 @@ const useAdditionalActions = (
       Component: ({ key }) => {
         const note = useStoreMap($additional, ({ note }) => note);
 
-        console.log({ note });
-
         return (
           <View
             key={key}

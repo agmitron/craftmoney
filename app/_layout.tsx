@@ -5,10 +5,11 @@ import {
   Link,
   NavigationContainer,
   ThemeProvider,
+  useNavigation,
   useRoute,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useStoreMap } from "effector-react";
+import { useStore, useStoreMap } from "effector-react";
 import { useFonts } from "expo-font";
 import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View, useColorScheme } from "react-native";
@@ -23,12 +24,13 @@ import CreateCategory from "./categories.create";
 import CreateTransaction from "./transactions.create";
 import { useTheme } from "../components/Themed";
 import { Theme } from "../constants/theme";
-import { categories } from "../store";
+import { accounts, categories } from "../store";
 import { flattenCategories } from "../utils/categories";
 
+import Button from "~/components/Button";
+import Typography from "~/components/Typography";
 import { incomeExpenseForm, transferForm } from "~/store/forms/transaction";
 import { AccountID, Category } from "~/store/types";
-import Button from "~/components/Button";
 
 export const enum Screens {
   Home = "home",
@@ -76,40 +78,46 @@ export const Tabs = () => {
   const theme = useTheme();
   const styles = withTheme(theme);
 
+  const totalBalance = useStoreMap(accounts.$totalBalance, (b) => b.toFixed(2));
+  const { navigate } = useNavigation();
+
   return (
     <View style={styles.navbar}>
-      {/* TODO: Typings */}
-      <Link
-        to={{ screen: Screens.TransactionsCreate as "transactions/create" }}
-        style={[styles.navbar__button, styles.navbar__button_icon]}
+      {/* TODO: Typings, styles */}
+      <View style={{ rowGap: 10 }}>
+        <Typography variant="text">Total balance</Typography>
+        <Typography variant="title">{totalBalance}</Typography>
+      </View>
+      {/* TODO: reuse */}
+      <Button
+        variant="icon"
+        onPress={() => navigate(Screens.TransactionsCreate as never)} // TODO: typings
       >
-        <Button variant="icon">
-          <View
-            style={{
-              position: "absolute",
-              backgroundColor: "white",
-              width: 22,
-              height: 3,
-              borderRadius: 3,
-            }}
-          />
-          <View
-            style={{
-              position: "absolute",
-              backgroundColor: "white",
-              width: 3,
-              height: 22,
-              borderRadius: 3,
-            }}
-          />
-        </Button>
-      </Link>
+        <View
+          style={{
+            position: "absolute",
+            backgroundColor: "white",
+            width: 22,
+            height: 3,
+            borderRadius: 3,
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            backgroundColor: "white",
+            width: 3,
+            height: 22,
+            borderRadius: 3,
+          }}
+        />
+      </Button>
     </View>
   );
 };
 
 function useTabs<T>(
-  Component: () => React.ReactElement
+  Component: () => React.ReactElement,
 ): (props: T) => React.ReactElement {
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -162,7 +170,7 @@ function RootLayoutNav() {
   const styles = withTheme(theme);
 
   const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/"))
+    Object.keys(flattenCategories(categories, "", {}, "/")),
   );
 
   const linking = useLinking(categoriesScreens);
@@ -249,33 +257,19 @@ const withTheme = (t: Theme) =>
       height: "100%",
     },
     navbar: {
+      paddingVertical: 30,
+      paddingHorizontal: 20,
+      borderTopWidth: 1,
+      borderTopColor: "rgb(217 217 220)",
       display: "flex",
       flexDirection: "row",
-      justifyContent: "center",
+      justifyContent: "space-between",
       alignItems: "center",
-      height: 50,
       width: "100%",
       backgroundColor: "white",
-    },
-    navbar__button: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "50%",
-      height: "100%",
-      textAlign: "center",
-      textAlignVertical: "center",
     },
     navbar__button_bordered: {
       borderRightWidth: 1,
       borderRightColor: t.colors.surface,
-    },
-    navbar__button_icon: {
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      borderColor: "black",
-      borderWidth: 1,
     },
   });

@@ -35,7 +35,3 @@ $transactions.on(remove, (previous, tx) => ({
   ...previous,
   [tx.account]: previous[tx.account]?.filter(({ id }) => id !== tx.id) ?? [],
 }));
-
-remove.watch(console.log);
-
-$transactions.watch(console.log);

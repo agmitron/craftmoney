@@ -28,6 +28,7 @@ import { flattenCategories } from "../utils/categories";
 
 import { incomeExpenseForm, transferForm } from "~/store/forms/transaction";
 import { AccountID, Category } from "~/store/types";
+import Button from "~/components/Button";
 
 export const enum Screens {
   Home = "home",
@@ -79,31 +80,36 @@ export const Tabs = () => {
     <View style={styles.navbar}>
       {/* TODO: Typings */}
       <Link
-        to={{ screen: Screens.Second as "second" }}
-        style={[styles.navbar__button]}
-      >
-        <Text>Two</Text>
-      </Link>
-      {/* TODO: Typings */}
-      <Link
         to={{ screen: Screens.TransactionsCreate as "transactions/create" }}
         style={[styles.navbar__button, styles.navbar__button_icon]}
       >
-        <Text>+</Text>
-      </Link>
-      {/* TODO: Typings */}
-      <Link
-        to={{ screen: Screens.Home as "home" }}
-        style={styles.navbar__button}
-      >
-        <Text>Home</Text>
+        <Button variant="icon">
+          <View
+            style={{
+              position: "absolute",
+              backgroundColor: "white",
+              width: 22,
+              height: 3,
+              borderRadius: 3,
+            }}
+          />
+          <View
+            style={{
+              position: "absolute",
+              backgroundColor: "white",
+              width: 3,
+              height: 22,
+              borderRadius: 3,
+            }}
+          />
+        </Button>
       </Link>
     </View>
   );
 };
 
 function useTabs<T>(
-  Component: () => React.ReactElement,
+  Component: () => React.ReactElement
 ): (props: T) => React.ReactElement {
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -156,7 +162,7 @@ function RootLayoutNav() {
   const styles = withTheme(theme);
 
   const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/")),
+    Object.keys(flattenCategories(categories, "", {}, "/"))
   );
 
   const linking = useLinking(categoriesScreens);

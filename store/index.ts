@@ -23,12 +23,12 @@ sample({
 
 sample({
   clock: accounts.create,
-  source: appearance.$emoji,
+  source: appearance.Emoji.$emoji,
   fn: (emoji, account) => ({
     ...emoji,
     accounts: { ...emoji.accounts, [account.id]: account.emoji },
   }),
-  target: appearance.$emoji,
+  target: appearance.Emoji.$emoji,
 });
 
 sample({
@@ -58,7 +58,7 @@ sample({
         ...accumulator,
         [accountID]: balances[accountID] ?? 0,
       }),
-      {},
+      {}
     ),
   target: accounts.$balances,
 });
@@ -80,7 +80,7 @@ sample({
   fn: (previous, tx) => {
     const previousTransactions = transactions.getAccountTransactions(
       previous,
-      tx.account,
+      tx.account
     );
     const newTransactions = [
       ...previousTransactions,

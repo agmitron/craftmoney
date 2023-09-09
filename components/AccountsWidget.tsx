@@ -1,6 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
+import { combine } from "effector";
 import { useStore, useStoreMap } from "effector-react";
 import {
+  Image,
+  ImageBackground,
   Pressable,
   PressableProps,
   StyleProp,
@@ -17,20 +20,96 @@ import Typography from "./Typography";
 import { Screens } from "~/app/_layout";
 import { Theme } from "~/constants/theme";
 import { accounts, appearance } from "~/store";
-import { AccountsView, Emoji } from "~/store/appearance";
 import { Account, Accounts, Balances } from "~/store/types";
 
 namespace Views {
   interface Props {
     accounts: Accounts;
     balances: Balances;
-    emoji: Emoji[keyof Emoji];
+    emoji: appearance.Emoji.Emoji[keyof appearance.Emoji.Emoji];
     edit: (account: Account) => void;
     create: () => void;
   }
 
-  export const Card: React.FC<Props> = () => {
-    return <></>;
+  export const Card: React.FC<Props> = ({ accounts, balances }) => {
+    const theme = useTheme();
+    const styles = withTheme(theme);
+
+    const sizes = {
+      width: 300,
+      height: 300,
+    };
+
+    return (
+      <>
+        {Object.values(accounts).map((account) => (
+          <View style={[styles.container, styles.container_card]}>
+            {/* TODO: refactor styles */}
+            <CardComponent
+              style={{
+                width: "100%",
+                padding: 0,
+                position: "relative",
+                height: sizes.height,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  zIndex: 1,
+                  position: "absolute",
+                  borderRadius: 20,
+                  height: sizes.height,
+                  width: "100%",
+                }}
+              />
+              <Image
+                source={{
+                  uri: "https://i.pinimg.com/originals/7a/0d/c2/7a0dc24f568b81a39ba1ce797f65d355.jpg",
+                  ...sizes,
+                }}
+                style={{
+                  width: "100%",
+                  borderRadius: 20,
+                  zIndex: -1,
+                  opacity: 0.8,
+                  position: "absolute",
+                }}
+                blurRadius={1.5}
+              />
+
+              <View
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 25,
+                  zIndex: 2,
+                  height: "100%",
+                }}
+              >
+                <Typography
+                  variant="text"
+                  color="white"
+                  style={{ fontWeight: "bold", fontSize: 40 }}
+                >
+                  {balances[account.id]} {account.currency}
+                </Typography>
+                <Typography
+                  variant="text"
+                  color="white"
+                  style={{
+                    fontWeight: "bold",
+                    marginBottom: 30,
+                    marginTop: "auto",
+                  }}
+                >
+                  {account.name}
+                </Typography>
+              </View>
+            </CardComponent>
+          </View>
+        ))}
+      </>
+    );
   };
 
   export const List: React.FC<Props> = () => {
@@ -44,8 +123,6 @@ namespace Views {
     edit,
     create,
   }) => {
-    // TODO: probably put in store to make dynamic
-
     const theme = useTheme();
     const styles = withTheme(theme);
 
@@ -57,14 +134,14 @@ namespace Views {
     };
 
     return (
-      <View style={styles.accounts_plates}>
+      <View style={[styles.container, styles.container_plates]}>
         {Object.values(accounts).map((account, key) => (
           <Pressable
             key={key}
             onPress={() => edit(account)}
             style={pressableStyles}
           >
-            <CardComponent style={styles.accounts_plates__plate}>
+            <CardComponent style={styles.container_plates__plate}>
               <Typography variant="text" style={{ fontSize: 25 }}>
                 {emoji[account.id]}
               </Typography>
@@ -78,8 +155,8 @@ namespace Views {
         <Pressable onPress={create} style={pressableStyles}>
           <CardComponent
             style={[
-              styles.accounts_plates__plate,
-              styles.accounts_plates__plate_add,
+              styles.container_plates__plate,
+              styles.container_plates__plate_add,
             ]}
           >
             <Button
@@ -99,10 +176,13 @@ namespace Views {
 
 // TODO: FSD
 const AccountsWidget: React.FC = () => {
-  const _appearance = useStore(appearance.$accounts);
+  const _view = useStore(appearance.Accounts.$view);
   const _accounts = useStore(accounts.$accounts);
   const _balances = useStore(accounts.$balances);
-  const _emoji = useStoreMap(appearance.$emoji, ({ accounts }) => accounts);
+  const _emoji = useStoreMap(
+    appearance.Emoji.$emoji,
+    ({ accounts }) => accounts
+  );
 
   const { navigate } = useNavigation();
 
@@ -118,12 +198,12 @@ const AccountsWidget: React.FC = () => {
     edit,
   };
 
-  switch (_appearance) {
-    case AccountsView.Card:
+  switch (_view) {
+    case appearance.Accounts.View.Card:
       return <Views.Card {...props} />;
-    case AccountsView.List:
+    case appearance.Accounts.View.List:
       return <Views.List {...props} />;
-    case AccountsView.Plates:
+    case appearance.Accounts.View.Plates:
       return <Views.Plates {...props} />;
   }
 };
@@ -131,24 +211,27 @@ const AccountsWidget: React.FC = () => {
 // TODO: refactor and reuse
 const withTheme = (t: Theme) =>
   StyleSheet.create({
-    accounts_plates: {
+    container: {
+      width: "100%",
+    },
+    container_card: {},
+    container_plates: {
       display: "flex",
       flexWrap: "wrap",
       flexDirection: "row",
-      justifyContent: "space-around",
+      // justifyContent: "space-around",
       rowGap: 15,
       columnGap: 5,
-      width: "100%",
     },
-    accounts_plates__plate: {
+    container_plates__plate: {
       rowGap: 5,
       alignItems: "flex-start",
       justifyContent: "space-between",
-      width: "100%",
       height: "100%",
+      width: "100%",
       minHeight: 100,
     },
-    accounts_plates__plate_add: {
+    container_plates__plate_add: {
       backgroundColor: "rgba(255, 255, 255, .5)",
       alignItems: "center",
     },

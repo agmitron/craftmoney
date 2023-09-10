@@ -10,6 +10,7 @@ import { categories } from "../store";
 import Button from "~/components/Button";
 import Select from "~/components/Select";
 import { useTheme } from "~/components/Themed";
+import Typography from "~/components/Typography";
 import { Theme } from "~/constants/theme";
 import { incomeExpenseForm } from "~/store/forms/transaction";
 
@@ -53,36 +54,51 @@ const Categories: React.FC = () => {
   };
 
   const createCategory = () => {
-    navigation.navigate(
-      ...([Screens.CategoriesCreate, { parent: currentCategory }] as never)
-    ); // TODO
+// TODO
   };
 
   return (
-    <View>
-      <Button onPress={createCategory}>Create</Button>
+    <View style={styles.root}>
+      <Button
+        onPress={createCategory}
+        variant="contained"
+        style={{ width: "50%" }}
+      >
+        Create
+      </Button>
       {currentCategory && (
         <Select
           title={currentCategory}
           onPress={() => onPress(currentCategory, "select")}
           emoji="👍"
+          style={{ backgroundColor: "white", borderRadius: 10 }} // TODO
         />
       )}
-      <View style={styles.separator} />
-      {Object.keys(_categories).map((c) => (
-        <Select
-          key={c}
-          title={c}
-          onPress={() => onPress(c, "dive")}
-          emoji="👀"
-        />
-      ))}
+      <Typography>Subcategories</Typography>
+      {Object.keys(_categories).map((c) => {
+        const subcategories = Object.keys(_categories?.[c] ?? {});
+        return (
+          <Select
+            key={c}
+            title={c}
+            onPress={() => onPress(c, "dive")}
+            emoji="👀"
+            style={{ backgroundColor: "white", borderRadius: 10 }} // TODO
+            description={subcategories.join("•")}
+          />
+        );
+      })}
     </View>
   );
 };
 
 const withTheme = (t: Theme) =>
   StyleSheet.create({
+    root: {
+      rowGap: 20,
+      paddingHorizontal: 15,
+      paddingVertical: 15,
+    },
     separator: {
       width: "100%",
       height: 1,

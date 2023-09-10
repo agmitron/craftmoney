@@ -155,7 +155,7 @@ namespace Views {
             style={[
               styles.container_plates__plate,
               styles.container_plates__plate_add,
-              { position: "relative" },
+              { position: "relative" }, // TODO
             ]}
           >
             <Button
@@ -240,10 +240,11 @@ const withTheme = (t: Theme) =>
       rowGap: 5,
       alignItems: "flex-start",
       justifyContent: "space-between",
+      alignContent: "center",
       // height: "100%",
       flexBasis: "100%",
       width: "100%",
-      minHeight: 100,
+      height: 115,
     },
     container_plates__plate_add: {
       backgroundColor: "rgba(255, 255, 255, .5)",

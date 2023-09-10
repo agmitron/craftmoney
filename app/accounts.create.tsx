@@ -40,13 +40,11 @@ const CreateAccount = () => {
       keyboardVerticalOffset={100}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps="always">
           <View style={styles.root}>
             <TextField
-              variant="filled"
               placeholder="Account's name"
               size="large"
-              keyboardType="number-pad"
               returnKeyType="done"
               onChangeText={form.setName}
               value={name}
@@ -54,6 +52,7 @@ const CreateAccount = () => {
             <TextField
               placeholder="Account's currency"
               size="large"
+              returnKeyType="done"
               onChangeText={form.setCurrency}
               value={currency}
             />

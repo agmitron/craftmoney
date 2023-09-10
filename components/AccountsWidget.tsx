@@ -205,7 +205,7 @@ const AccountsWidget: React.FC = () => {
 
   const create = () => navigate(Screens.AccountsCreate as never); // TODO: Types
   const edit = (account: Account) =>
-    navigate(...([`accounts/edit`, { id: account.id }] as never));
+    navigate(...([Screens.AccountsEdit, { id: account.id }] as never));
 
   const props = {
     accounts: _accounts,

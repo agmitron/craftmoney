@@ -4,7 +4,15 @@ import { createEffect, createEvent, createStore, sample } from "effector";
 type Currency = string;
 type Rates = Record<Currency, number>;
 
-export const $primary = createStore<Currency>("USD");
+export function convert(value: number, rate: number): number {
+  return value * rate;
+}
+
+export function getRate(amountA: number, amountB: number) {
+  return amountA / amountB;
+}
+
+export const $primary = createStore<Currency>("USD"); // TODO
 persist({ key: "currencies.$primary", store: $primary });
 
 export const $rates = createStore<Rates | null>(null);
@@ -28,6 +36,8 @@ const requestRatesFx = createEffect(async (): Promise<Rates> => {
 });
 
 export const requestRates = createEvent();
+export const setRates = createEvent<Rates>();
+export const setPrimary = createEvent<Currency>();
 
 sample({
   clock: requestRates,
@@ -36,5 +46,15 @@ sample({
 
 sample({
   clock: requestRatesFx.doneData,
+  target: setRates,
+});
+
+sample({
+  clock: setRates,
   target: $rates,
+});
+
+sample({
+  clock: setPrimary,
+  target: $primary,
 });

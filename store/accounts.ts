@@ -1,8 +1,10 @@
 import { persist } from "@effector-storage/react-native-async-storage";
-import { combine, createEvent, createStore } from "effector";
+import { Store, combine, createEvent, createStore } from "effector";
 import _ from "lodash";
 
+import { SystemCategories } from "./categories";
 import * as currencies from "./currencies";
+import * as transactions from "./transactions";
 import { Account, AccountID, Accounts, Balances } from "./types";
 
 interface Create extends Account {
@@ -11,8 +13,24 @@ interface Create extends Account {
 
 export const $accounts = createStore<Accounts>({});
 persist({ store: $accounts, key: "$accounts" });
-export const $balances = createStore<Balances>({});
-persist({ store: $balances, key: "$balances" });
+// TODO: simplify
+export const $balances: Store<Balances> = combine(
+  transactions.$transactions,
+  (transactions) => {
+    return Object.entries(transactions).reduce<Balances>(
+      (balances, [accountID, txs]) => {
+        return {
+          ...balances,
+          [accountID]: txs.reduce<number>((b, { amount }) => {
+            return b + amount;
+          }, 0),
+        };
+      },
+      {},
+    );
+  },
+);
+
 export const $totalBalance = combine(
   $balances,
   currencies.$rates,
@@ -27,7 +45,7 @@ export const $totalBalance = combine(
       const rate = rates[account.currency];
       return total + balance / rate;
     }, 0);
-  }
+  },
 );
 
 export const create = createEvent<Create>();

@@ -1,18 +1,17 @@
-import { Link, useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
 import _ from "lodash";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Screens } from "./_layout";
+import { Screens } from "./navigation";
 import { categories } from "../store";
 
+import Button from "~/components/Button";
 import Select from "~/components/Select";
 import { useTheme } from "~/components/Themed";
 import { Theme } from "~/constants/theme";
 import { incomeExpenseForm } from "~/store/forms/transaction";
-import CreateCategory from "./categories.create";
-import Button from "~/components/Button";
 
 const Categories: React.FC = () => {
   const route = useRoute();

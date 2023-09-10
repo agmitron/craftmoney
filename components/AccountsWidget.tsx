@@ -1,11 +1,8 @@
 import { useNavigation } from "@react-navigation/native";
-import { combine } from "effector";
 import { useStore, useStoreMap } from "effector-react";
 import {
   Image,
-  ImageBackground,
   Pressable,
-  PressableProps,
   StyleProp,
   StyleSheet,
   View,
@@ -17,7 +14,7 @@ import CardComponent from "./Card";
 import { useTheme } from "./Themed";
 import Typography from "./Typography";
 
-import { Screens } from "~/app/_layout";
+import { Screens } from "~/app/navigation";
 import { Theme } from "~/constants/theme";
 import { accounts, appearance } from "~/store";
 import { Account, Accounts, Balances } from "~/store/types";

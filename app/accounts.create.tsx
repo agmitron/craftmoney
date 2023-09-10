@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { Screens } from "./_layout";
+import { Screens } from "./navigation";
 
 import Button from "~/components/Button";
 import TextField from "~/components/TextField";

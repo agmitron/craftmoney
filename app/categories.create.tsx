@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import { RootStackParamList, Screens } from "./_layout";
+import { RootStackParamList, Screens } from "./navigation";
 
 import Button from "~/components/Button";
 import TextField from "~/components/TextField";
@@ -32,7 +32,7 @@ const CreateCategory = () => {
     useRoute<RouteProp<RootStackParamList, Screens.CategoriesCreate>>();
 
   useEffect(() => {
-    form.setParent(route.params.parent);
+    form.setParent(route.params?.parent ?? "");
   }, [route.params]);
 
   const onSubmit = () => {

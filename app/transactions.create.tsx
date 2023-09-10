@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { Store } from "effector";
 import { useStore, useStoreMap } from "effector-react";
 import * as Haptics from "expo-haptics";
@@ -13,7 +13,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { Screens } from "./_layout";
+import { Screens } from "./navigation";
 
 import Button from "~/components/Button";
 import Card from "~/components/Card";
@@ -32,6 +32,11 @@ import {
 } from "~/store/forms/transaction";
 import { Additional } from "~/store/types";
 import { isFailed } from "~/utils/validation";
+import { flattenCategories } from "~/utils/categories";
+import { createStackNavigator } from "@react-navigation/stack";
+import Categories from "./categories";
+import CreateCategory from "./categories.create";
+import { categories } from "~/store";
 
 interface ActionComponentProps {
   key: string | number;
@@ -40,6 +45,8 @@ interface ActionComponentProps {
 interface Action {
   Component: (props: ActionComponentProps) => React.ReactElement;
 }
+
+const ModalStack = createStackNavigator();
 
 // TODO: make dynamic
 const useAdditionalActions = (
@@ -51,7 +58,7 @@ const useAdditionalActions = (
 
   const additionalActions: Action[] = [
     {
-      Component: ({ key }) => {
+      Component: () => {
         const [isOpen, setOpen] = useState(false);
 
         const date = useStoreMap(
@@ -60,7 +67,7 @@ const useAdditionalActions = (
         );
 
         return (
-          <View key={key} style={styles["additional__list-item"]}>
+          <View style={styles["additional__list-item"]}>
             <DatePicker
               isOpen={isOpen}
               date={date}
@@ -75,12 +82,11 @@ const useAdditionalActions = (
       },
     },
     {
-      Component: ({ key }) => {
+      Component: () => {
         const note = useStoreMap($additional, ({ note }) => note);
 
         return (
           <View
-            key={key}
             style={[
               styles["additional__list-item"],
               styles["additional__list-item_last"],
@@ -283,6 +289,10 @@ export const IncomeExpenseForm = () => {
   const amount = useStore(incomeExpenseForm.$amount);
   const isDisabled = useStoreMap(incomeExpenseForm.$validation, isFailed);
   const validation = useStore(incomeExpenseForm.$validation);
+
+  const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
+    Object.keys(flattenCategories(categories, "", {}, "/"))
+  );
 
   const onTypeChange = (newType: TransactionType) => {
     if (Platform.OS !== "web") {

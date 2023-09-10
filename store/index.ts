@@ -126,10 +126,6 @@ sample({
   target: transactions.$transactions,
 });
 
-// accounts.create({ currency: "USD", name: "USD", emoji: "🇺🇸", id: nanoid() });
-// accounts.create({ currency: "THB", name: "THB", emoji: "🇹🇭", id: nanoid() });
-// accounts.create({ currency: "RUB", name: "RUB", emoji: "🇷🇺", id: nanoid() });
-
 currencies.requestRates();
 
 export { accounts, transactions, categories, appearance, currencies };

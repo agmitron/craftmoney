@@ -2,17 +2,19 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
-  Link,
   NavigationContainer,
   ThemeProvider,
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useStore, useStoreMap } from "effector-react";
+import {
+  CardStyleInterpolators,
+  TransitionPresets,
+} from "@react-navigation/stack";
+import { useStoreMap } from "effector-react";
 import { useFonts } from "expo-font";
 import { useEffect, useMemo } from "react";
-import { StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
 import TabOneScreen from "./(tabs)";
 import TabTwoScreen from "./(tabs)/two";
@@ -21,6 +23,13 @@ import CreateAccount from "./accounts.create";
 import EditAccount from "./accounts.edit";
 import Categories from "./categories";
 import CreateCategory from "./categories.create";
+import {
+  forHorizontalModal,
+  Screens,
+  screensWithTabs,
+  Stack,
+  useLinking,
+} from "./navigation";
 import CreateTransaction from "./transactions.create";
 import { useTheme } from "../components/Themed";
 import { Theme } from "../constants/theme";
@@ -30,29 +39,6 @@ import { flattenCategories } from "../utils/categories";
 import Button from "~/components/Button";
 import Typography from "~/components/Typography";
 import { incomeExpenseForm, transferForm } from "~/store/forms/transaction";
-import { AccountID, Category } from "~/store/types";
-
-export const enum Screens {
-  Home = "home",
-  Second = "second",
-  TransactionsCreate = "transactions/create",
-  Categories = "categories",
-  CategoriesCreate = "categories/create",
-  Accounts = "accounts",
-  AccountsTransferTo = "accounts/transfer/to",
-  AccountsTransferFrom = "accounts/transfer/from",
-  AccountsCreate = "accounts/create",
-  AccountsEdit = "accounts/edit",
-}
-
-export type RootStackParamList = {
-  [Screens.AccountsEdit]: { id: AccountID };
-  [Screens.CategoriesCreate]: { parent: Category };
-};
-
-export const Stack = createNativeStackNavigator<RootStackParamList>();
-
-const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -117,7 +103,7 @@ export const Tabs = () => {
 };
 
 function useTabs<T>(
-  Component: () => React.ReactElement,
+  Component: () => React.ReactElement
 ): (props: T) => React.ReactElement {
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -135,42 +121,13 @@ function useTabs<T>(
   return Container;
 }
 
-const useLinking = (categoriesScreens: string[] = []) => {
-  const linking = useMemo(() => {
-    const result = {
-      config: {
-        screens: {
-          [Screens.Home]: "/",
-          [Screens.TransactionsCreate]: "transactions/create",
-          [Screens.Second]: "two",
-          [Screens.Categories]: "categories",
-          [Screens.Accounts]: "accounts",
-          [Screens.AccountsTransferFrom]: "accounts/transfer/from",
-          [Screens.AccountsTransferTo]: "accounts/transfer/to",
-          [Screens.AccountsCreate]: "accounts/create",
-        } as Record<string, string>,
-      },
-      prefixes: [],
-    };
-
-    for (const cs of categoriesScreens) {
-      const route = `${Screens.Categories}/${cs}`;
-      result.config.screens[route] = route;
-    }
-
-    return result;
-  }, []);
-
-  return linking;
-};
-
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const theme = useTheme();
   const styles = withTheme(theme);
 
   const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/")),
+    Object.keys(flattenCategories(categories, "", {}, "/"))
   );
 
   const linking = useLinking(categoriesScreens);
@@ -187,47 +144,67 @@ function RootLayoutNav() {
           <Stack.Navigator>
             <Stack.Screen
               name={Screens.Home}
-              // options={{ headerShown: false }}
+              options={{ headerTitle: "Finance" }}
               component={tabOne}
             />
             <Stack.Screen
-              name={Screens.Second}
-              // options={{ headerShown: false }}
+              name={Screens.Settings}
+              options={{ headerTitle: "Settings" }}
               component={tabTwo}
             />
             <Stack.Screen
               name={Screens.TransactionsCreate}
               options={{
                 presentation: "modal",
+                headerTitle: "Add a transaction",
               }}
               component={CreateTransaction}
             />
 
             <Stack.Screen
               name={Screens.Accounts}
-              component={() => (
+              options={{
+                headerTitle: "Choose an account",
+              }}
+              children={() => (
                 <Accounts onChange={incomeExpenseForm.selectAccount} />
               )}
             />
 
             <Stack.Screen
               name={Screens.AccountsTransferFrom}
-              component={() => <Accounts onChange={transferForm.selectFrom} />}
+              options={{
+                headerTitle: "Transfer from",
+              }}
+              children={() => <Accounts onChange={transferForm.selectFrom} />}
             />
 
             <Stack.Screen
               name={Screens.AccountsTransferTo}
-              component={() => <Accounts onChange={transferForm.selectTo} />}
+              options={{
+                headerTitle: "Transfer to",
+              }}
+              children={() => <Accounts onChange={transferForm.selectTo} />}
             />
 
             <Stack.Screen
               name={Screens.AccountsCreate}
+              options={{
+                headerTitle: "Add an account",
+              }}
               component={CreateAccount}
             />
 
             <Stack.Screen name={Screens.AccountsEdit} component={EditAccount} />
 
-            <Stack.Screen name={Screens.Categories} component={Categories} />
+            <Stack.Screen
+              name={Screens.Categories}
+              component={Categories}
+              options={{
+                headerTitle: "Categories",
+                presentation: "modal"
+              }}
+            />
             <Stack.Screen
               name={Screens.CategoriesCreate}
               component={CreateCategory}
@@ -238,6 +215,10 @@ function RootLayoutNav() {
                 key={cs}
                 name={`categories/${cs}`}
                 component={Categories}
+                options={{
+                  headerTitle: "Categories",
+                  presentation: "modal"
+                }}
               />
             ))}
           </Stack.Navigator>

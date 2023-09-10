@@ -128,6 +128,7 @@ namespace Views {
       minWidth: 160,
       width: "100%",
       alignItems: "center",
+      flex: 1,
     };
 
     return (
@@ -154,29 +155,26 @@ namespace Views {
             style={[
               styles.container_plates__plate,
               styles.container_plates__plate_add,
+              { position: "relative" },
             ]}
           >
             <Button
               variant="icon"
               onPress={create}
-              style={{ marginTop: "auto", marginBottom: "auto" }}
+              style={{
+                marginTop: "auto",
+                marginBottom: "auto",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <View
+              <Image
+                source={require("../assets/images/plus.png")}
                 style={{
-                  position: "absolute",
-                  backgroundColor: "white",
-                  width: 22,
-                  height: 3,
-                  borderRadius: 3,
-                }}
-              />
-              <View
-                style={{
-                  position: "absolute",
-                  backgroundColor: "white",
-                  width: 3,
-                  height: 22,
-                  borderRadius: 3,
+                  // TODO
+                  width: 40,
+                  height: 45,
+                  margin: 0,
                 }}
               />
             </Button>
@@ -242,7 +240,8 @@ const withTheme = (t: Theme) =>
       rowGap: 5,
       alignItems: "flex-start",
       justifyContent: "space-between",
-      height: "100%",
+      // height: "100%",
+      flexBasis: "100%",
       width: "100%",
       minHeight: 100,
     },

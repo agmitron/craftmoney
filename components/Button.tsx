@@ -97,6 +97,7 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
       alignItems: "center",
       fontSize: size === "large" ? 20 : 16,
       fontWeight: variant === "icon" ? "bold" : "normal",
+      textAlign: "center",
     },
     common: {
       paddingVertical: 10,

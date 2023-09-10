@@ -36,13 +36,9 @@ export const $totalBalance = combine(
   currencies.$rates,
   $accounts,
   (balances, rates, accounts) => {
-    if (!rates) {
-      return 0;
-    }
-
     return Object.values(accounts).reduce<number>((total, account) => {
       const balance = balances[account.id];
-      const rate = rates[account.currency];
+      const rate = rates?.[account.currency] ?? 1;
       return total + balance / rate;
     }, 0);
   },

@@ -14,7 +14,13 @@ import {
 import { useStoreMap } from "effector-react";
 import { useFonts } from "expo-font";
 import { useEffect, useMemo } from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  View,
+  useColorScheme,
+} from "react-native";
 
 import TabOneScreen from "./(tabs)";
 import TabTwoScreen from "./(tabs)/two";
@@ -79,22 +85,13 @@ export const Tabs = () => {
         variant="icon"
         onPress={() => navigate(Screens.TransactionsCreate as never)} // TODO: typings
       >
-        <View
+        <Image
+          source={require("../assets/images/plus.png")}
           style={{
-            position: "absolute",
-            backgroundColor: "white",
-            width: 22,
-            height: 3,
-            borderRadius: 3,
-          }}
-        />
-        <View
-          style={{
-            position: "absolute",
-            backgroundColor: "white",
-            width: 3,
-            height: 22,
-            borderRadius: 3,
+            // TODO
+            width: 40,
+            height: 45,
+            margin: 0,
           }}
         />
       </Button>
@@ -142,85 +139,102 @@ function RootLayoutNav() {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <Stack.Navigator>
-            <Stack.Screen
-              name={Screens.Home}
-              options={{ headerTitle: "Finance" }}
-              component={tabOne}
-            />
-            <Stack.Screen
-              name={Screens.Settings}
-              options={{ headerTitle: "Settings" }}
-              component={tabTwo}
-            />
-            <Stack.Screen
-              name={Screens.TransactionsCreate}
-              options={{
-                presentation: "modal",
-                headerTitle: "Add a transaction",
-              }}
-              component={CreateTransaction}
-            />
-
-            <Stack.Screen
-              name={Screens.Accounts}
-              options={{
-                headerTitle: "Choose an account",
-              }}
-              children={() => (
-                <Accounts onChange={incomeExpenseForm.selectAccount} />
-              )}
-            />
-
-            <Stack.Screen
-              name={Screens.AccountsTransferFrom}
-              options={{
-                headerTitle: "Transfer from",
-              }}
-              children={() => <Accounts onChange={transferForm.selectFrom} />}
-            />
-
-            <Stack.Screen
-              name={Screens.AccountsTransferTo}
-              options={{
-                headerTitle: "Transfer to",
-              }}
-              children={() => <Accounts onChange={transferForm.selectTo} />}
-            />
-
-            <Stack.Screen
-              name={Screens.AccountsCreate}
-              options={{
-                headerTitle: "Add an account",
-              }}
-              component={CreateAccount}
-            />
-
-            <Stack.Screen name={Screens.AccountsEdit} component={EditAccount} />
-
-            <Stack.Screen
-              name={Screens.Categories}
-              component={Categories}
-              options={{
-                headerTitle: "Categories",
-                presentation: "modal"
-              }}
-            />
-            <Stack.Screen
-              name={Screens.CategoriesCreate}
-              component={CreateCategory}
-            />
-
-            {categoriesScreens.map((cs) => (
+            <Stack.Group>
               <Stack.Screen
-                key={cs}
-                name={`categories/${cs}`}
+                name={Screens.Home}
+                options={{ headerTitle: "Finance" }}
+                component={tabOne}
+              />
+              <Stack.Screen
+                name={Screens.Settings}
+                options={{ headerTitle: "Settings" }}
+                component={tabTwo}
+              />
+            </Stack.Group>
+
+            <Stack.Group
+              screenOptions={{
+                presentation: "modal",
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+              }}
+            >
+              <Stack.Screen
+                name={Screens.TransactionsCreate}
+                options={{
+                  presentation: "modal",
+                  headerTitle: "Add a transaction",
+                }}
+                component={CreateTransaction}
+              />
+
+              <Stack.Screen
+                name={Screens.Accounts}
+                options={{
+                  headerTitle: "Choose an account",
+                }}
+                children={() => (
+                  <Accounts onChange={incomeExpenseForm.selectAccount} />
+                )}
+              />
+
+              <Stack.Screen
+                name={Screens.AccountsTransferFrom}
+                options={{
+                  headerTitle: "Transfer from",
+                }}
+                children={() => <Accounts onChange={transferForm.selectFrom} />}
+              />
+
+              <Stack.Screen
+                name={Screens.AccountsTransferTo}
+                options={{
+                  headerTitle: "Transfer to",
+                }}
+                children={() => <Accounts onChange={transferForm.selectTo} />}
+              />
+
+              <Stack.Screen
+                name={Screens.AccountsCreate}
+                options={{
+                  headerTitle: "Add an account",
+                }}
+                component={CreateAccount}
+              />
+
+              <Stack.Screen
+                name={Screens.AccountsEdit}
+                component={EditAccount}
+              />
+
+              <Stack.Screen
+                name={Screens.Categories}
                 component={Categories}
                 options={{
                   headerTitle: "Categories",
-                  presentation: "modal"
+                  presentation: "modal",
+                  cardStyleInterpolator:
+                    CardStyleInterpolators.forHorizontalIOS,
                 }}
               />
-            ))}
+              <Stack.Screen
+                name={Screens.CategoriesCreate}
+                component={CreateCategory}
+              />
+
+              {categoriesScreens.map((cs) => (
+                <Stack.Screen
+                  key={cs}
+                  name={`categories/${cs}`}
+                  component={Categories}
+                  options={{
+                    headerTitle: "Categories",
+                    presentation: "modal",
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forHorizontalIOS,
+                  }}
+                />
+              ))}
+            </Stack.Group>
           </Stack.Navigator>
         </ThemeProvider>
       </View>

@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export interface Theme {
   colors: {
     primary: string;
@@ -30,7 +32,7 @@ const themes: Record<"light" | "dark", Theme> = {
     },
     borderRadius: 10,
     layout: {
-      plates: 4,
+      plates: Platform.OS === "web" ? 4 : 2,
     },
   },
   dark: {
@@ -47,7 +49,7 @@ const themes: Record<"light" | "dark", Theme> = {
     },
     borderRadius: 10,
     layout: {
-      plates: 4,
+      plates: Platform.OS === "web" ? 4 : 2,
     },
   },
 };

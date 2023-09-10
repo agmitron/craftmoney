@@ -1,4 +1,6 @@
+import _ from "lodash";
 import {
+  CardStyleInterpolators,
   StackCardInterpolatedStyle,
   StackCardInterpolationProps,
   createStackNavigator,
@@ -33,20 +35,47 @@ export const screensWithTabs = new Set<string>([
   Screens.Settings,
 ]);
 
+const { multiply } = Animated;
 export function forHorizontalModal({
+  closing,
   current,
-  next,
+  index,
+  insets,
   inverted,
-  layouts: { screen },
+  layouts,
+  swiping,
+  next,
 }: StackCardInterpolationProps): StackCardInterpolatedStyle {
-  const translateFocused = Animated.multiply(
+  const iOSStandardModal = CardStyleInterpolators.forModalPresentationIOS({
+    closing,
+    current,
+    index,
+    insets,
+    inverted,
+    layouts,
+    swiping,
+    next,
+  });
+
+  const translateFocused = multiply(
     current.progress.interpolate({
       inputRange: [0, 1],
-      outputRange: [screen.width, 0],
+      outputRange: [layouts.screen.width, 0],
       extrapolate: "clamp",
     }),
     inverted
   );
+
+  const translateUnfocused = next
+    ? multiply(
+        next.progress.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, layouts.screen.width * -0.3],
+          extrapolate: "clamp",
+        }),
+        inverted
+      )
+    : 0;
 
   const overlayOpacity = current.progress.interpolate({
     inputRange: [0, 1],
@@ -60,18 +89,33 @@ export function forHorizontalModal({
     extrapolate: "clamp",
   });
 
-  return {
-    cardStyle: {
-      transform: [
-        // Translation for the animation of the current card
-        { translateX: translateFocused },
-        // Translation for the animation of the card in back
-        { translateX: 0 },
-      ],
-    },
-    overlayStyle: { opacity: overlayOpacity },
-    shadowStyle: { shadowOpacity },
-  };
+  iOSStandardModal.cardStyle.transform = [
+    // Translation for the animation of the current card
+    { translateX: translateFocused },
+    // Translation for the animation of the card on top of this
+    { translateX: translateUnfocused },
+  ];
+
+  iOSStandardModal.overlayStyle.opacity = overlayOpacity;
+  // iOSStandardModal.shadowStyle.shadowOpacity = shadowOpacity;
+
+  return iOSStandardModal;
+
+  // return {
+  //   cardStyle: {
+  //     ...iOSStandardModal.cardStyle,
+  //     transform: [
+  //       // Translation for the animation of the current card
+  //       { translateX: translateFocused },
+  //       // Translation for the animation of the card on top of this
+  //       { translateX: translateUnfocused },
+  //     ],
+  //   },
+  //   overlayStyle: { ...iOSStandardModal.overlayStyle },
+  //   // shadowStyle: { shadowOpacity },
+  //   shadowStyle: iOSStandardModal.shadowStyle,
+  //   containerStyle: iOSStandardModal.containerStyle,
+  // };
 }
 
 export const useLinking = (categoriesScreens: string[] = []) => {

@@ -1,5 +1,5 @@
 import { useStore, useStoreMap } from "effector-react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
 import AccountsWidget from "~/components/AccountsWidget";
@@ -17,48 +17,52 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.root}>
-      <View style={styles.accounts}>
-        <AccountsWidget />
-      </View>
+      <ScrollView>
+        <View style={styles.accounts}>
+          <AccountsWidget />
+        </View>
 
-      <View style={styles.transactions}>
-        <Typography variant="title">Transactions</Typography>
-        {allTransactions.map((tx) => (
-          <View style={{ width: "100%" }}>
-            <Swipeable
-              key={tx.id}
-              renderRightActions={() => (
-                <Button onPress={() => transactions.remove(tx)}>Delete</Button>
-              )}
-            >
-              <Card
-                // TODO: styles
-                style={{
-                  width: "100%",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  paddingVertical: 20,
-                }}
+        <View style={styles.transactions}>
+          <Typography variant="title">Transactions</Typography>
+          {allTransactions.map((tx) => (
+            <View style={{ width: "100%" }}>
+              <Swipeable
+                key={tx.id}
+                renderRightActions={() => (
+                  <Button onPress={() => transactions.remove(tx)}>
+                    Delete
+                  </Button>
+                )}
               >
-                <View style={{ rowGap: 5 }}>
-                  <Typography variant="title">{tx.category}</Typography>
-                  <Typography variant="subtitle">
-                    {_accounts[tx.account].name}
-                  </Typography>
-                </View>
-                <View style={{ rowGap: 5 }}>
-                  <Typography variant="title" align="right">
-                    {tx.amount} {_accounts[tx.account].currency}
-                  </Typography>
-                  <Typography variant="subtitle" align="right">
-                    {new Date(tx.additional.timestamp).toLocaleDateString()}
-                  </Typography>
-                </View>
-              </Card>
-            </Swipeable>
-          </View>
-        ))}
-      </View>
+                <Card
+                  // TODO: refactor styles
+                  style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingVertical: 20,
+                  }}
+                >
+                  <View style={{ rowGap: 5 }}>
+                    <Typography variant="title">{tx.category}</Typography>
+                    <Typography variant="subtitle">
+                      {_accounts[tx.account].name}
+                    </Typography>
+                  </View>
+                  <View style={{ rowGap: 5 }}>
+                    <Typography variant="title" align="right">
+                      {tx.amount} {_accounts[tx.account].currency}
+                    </Typography>
+                    <Typography variant="subtitle" align="right">
+                      {new Date(tx.additional.timestamp).toLocaleDateString()}
+                    </Typography>
+                  </View>
+                </Card>
+              </Swipeable>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -69,7 +73,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     padding: 20,
-    rowGap: 30,
   },
   title: {
     fontSize: 20,
@@ -90,5 +93,6 @@ const styles = StyleSheet.create({
   transactions: {
     width: "100%",
     rowGap: 20,
+    marginTop: 20
   },
 });

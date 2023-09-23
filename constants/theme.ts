@@ -32,7 +32,7 @@ const themes: Record<"light" | "dark", Theme> = {
     },
     borderRadius: 10,
     layout: {
-      plates: Platform.OS === "web" ? 4 : 2,
+      plates: 4,
     },
   },
   dark: {
@@ -49,7 +49,7 @@ const themes: Record<"light" | "dark", Theme> = {
     },
     borderRadius: 10,
     layout: {
-      plates: Platform.OS === "web" ? 4 : 2,
+      plates: 4,
     },
   },
 };

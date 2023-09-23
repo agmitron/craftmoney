@@ -18,6 +18,9 @@ import { Screens } from "~/app/navigation";
 import { Theme } from "~/constants/theme";
 import { accounts, appearance } from "~/store";
 import { Account, Accounts, Balances } from "~/store/types";
+import { useMemo, useState } from "react";
+import { takeRange } from "~/utils/range";
+import Swiper from "react-native-swiper";
 
 namespace Views {
   interface Props {
@@ -122,66 +125,88 @@ namespace Views {
   }) => {
     const theme = useTheme();
     const styles = withTheme(theme);
+    const [maxHeight, setMaxHeight] = useState<number | null>(null);
 
-    const pressableStyles: StyleProp<ViewStyle> = {
-      maxWidth: `${100 / theme.layout.plates - 1}%`,
-      minWidth: 160,
-      width: "100%",
-      alignItems: "center",
-      flex: 1,
-    };
+    const _accounts = Object.values(accounts);
+
+    const pagesCount = Math.ceil(
+      Object.keys(accounts).length / theme.layout.plates
+    );
+    const lastPage = pagesCount - 1;
+
+    const pages = new Array(pagesCount).fill(null).map((_, page) => {
+      const maxPlatesOnPage =
+        page === lastPage ? theme.layout.plates - 1 : theme.layout.plates;
+
+      return takeRange(_accounts, maxPlatesOnPage, page);
+    });
 
     return (
-      <View style={[styles.container, styles.container_plates]}>
-        {Object.values(accounts).map((account, key) => (
-          <Pressable
-            key={key}
-            onPress={() => edit(account)}
-            style={pressableStyles}
+      <Swiper
+        style={{ maxHeight }}
+        dotStyle={{ marginTop: "auto", marginBottom: 0 }}
+        activeDotStyle={{ marginTop: "auto", marginBottom: 0 }}
+      >
+        {pages.map((accountsOnPage, page) => (
+          <View
+            key={page}
+            style={[styles.container_plates__page]}
+            onLayout={(e) => setMaxHeight(e.nativeEvent.layout.height + 30)}
           >
-            <CardComponent style={styles.container_plates__plate}>
-              <Typography variant="text" style={{ fontSize: 25 }}>
-                {emoji[account.id]}
-              </Typography>
-              <Typography variant="subtitle">{account.name}</Typography>
-              <Typography variant="title">
-                {balances[account.id]} {account.currency}
-              </Typography>
-            </CardComponent>
-          </Pressable>
+            {accountsOnPage.map((account) => (
+              <CardComponent
+                style={styles.container_plates__plate}
+                key={account.id}
+              >
+                <Pressable onPress={() => edit(account)}>
+                  <Typography variant="text" style={{ fontSize: 25 }}>
+                    {emoji[account.id]}
+                  </Typography>
+                  <Typography variant="subtitle">{account.name}</Typography>
+                  <Typography variant="subtitle">
+                    {balances[account.id]} {account.currency}
+                  </Typography>
+                </Pressable>
+              </CardComponent>
+            ))}
+            {page === lastPage && (
+              <CardComponent
+                style={[
+                  styles.container_plates__plate,
+                  styles.container_plates__plate_add,
+                ]}
+              >
+                <Pressable
+                  onPress={create}
+                  style={{ alignItems: "center", rowGap: 10 }}
+                >
+                  <Button
+                    variant="icon"
+                    onPress={create}
+                    style={{
+                      marginTop: "auto",
+                      marginBottom: "auto",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Image
+                      source={require("../assets/images/plus.png")}
+                      style={{
+                        // TODO
+                        width: 40,
+                        height: 45,
+                        margin: 0,
+                      }}
+                    />
+                  </Button>
+                  <Typography variant="subtitle">Add account</Typography>
+                </Pressable>
+              </CardComponent>
+            )}
+          </View>
         ))}
-        <Pressable onPress={create} style={pressableStyles}>
-          <CardComponent
-            style={[
-              styles.container_plates__plate,
-              styles.container_plates__plate_add,
-              { position: "relative" }, // TODO
-            ]}
-          >
-            <Button
-              variant="icon"
-              onPress={create}
-              style={{
-                marginTop: "auto",
-                marginBottom: "auto",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                source={require("../assets/images/plus.png")}
-                style={{
-                  // TODO
-                  width: 40,
-                  height: 45,
-                  margin: 0,
-                }}
-              />
-            </Button>
-            <Typography variant="subtitle">Add account</Typography>
-          </CardComponent>
-        </Pressable>
-      </View>
+      </Swiper>
     );
   };
 }
@@ -224,31 +249,26 @@ const AccountsWidget: React.FC = () => {
 const withTheme = (t: Theme) =>
   StyleSheet.create({
     container: {
-      width: "100%",
-      marginHorizontal: "auto",
+      flexDirection: "row",
+      alignSelf: "flex-start",
     },
     container_card: {},
-    container_plates: {
+    container_plates: {},
+    container_plates__page: {
+      // flex: 1,
       display: "flex",
       flexWrap: "wrap",
       flexDirection: "row",
-      justifyContent: "space-between",
-      rowGap: 15,
-      columnGap: 5,
+      alignContent: "flex-start",
+      gap: 5,
+      padding: 15,
     },
     container_plates__plate: {
-      rowGap: 5,
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-      alignContent: "center",
-      // height: "100%",
-      flexBasis: "100%",
-      width: "100%",
-      height: 115,
+      flexBasis: "49%",
+      height: 100,
     },
     container_plates__plate_add: {
       backgroundColor: "rgba(255, 255, 255, .5)",
-      alignItems: "center",
     },
   });
 

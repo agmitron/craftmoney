@@ -18,14 +18,12 @@ export default function TabOneScreen() {
   return (
     <View style={styles.root}>
       <ScrollView>
-        <View style={styles.accounts}>
-          <AccountsWidget />
-        </View>
+        <AccountsWidget />
 
-        <View style={styles.transactions}>
+        {/* <View style={styles.transactions}>
           <Typography variant="title">Transactions</Typography>
           {allTransactions.map((tx) => (
-            <View style={{ width: "100%" }}>
+            <View style={{ width: "100%" }} key={tx.id}>
               <Swipeable
                 key={tx.id}
                 renderRightActions={() => (
@@ -61,7 +59,7 @@ export default function TabOneScreen() {
               </Swipeable>
             </View>
           ))}
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
@@ -72,7 +70,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    padding: 20,
+    flexBasis: "100%",
+    // overflow: "hidden",
+    // padding: 20,
   },
   title: {
     fontSize: 20,
@@ -88,11 +88,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 20,
-    width: "100%",
+    // maxWidth: "100%",
+    flexBasis: "100%",
   },
   transactions: {
     width: "100%",
     rowGap: 20,
-    marginTop: 20
+    marginTop: 20,
   },
 });

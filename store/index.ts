@@ -65,7 +65,7 @@ sample({
   fn: (previous, tx) => {
     const previousTransactions = transactions.getAccountTransactions(
       previous,
-      tx.account
+      tx.account,
     );
     const newTransactions = [
       ...previousTransactions,

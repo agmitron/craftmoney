@@ -41,11 +41,11 @@ export const update = createEvent<{
 $categories.reset(reset);
 
 $categories.on(create, (categories, { name, parent = "" }) =>
-  _.set(categories, `${parent}.${name}`, null)
+  _.set(categories, `${parent}.${name}`, null),
 );
 
 $categories.on(remove, (categories, removable) =>
-  _.omit(categories, removable)
+  _.omit(categories, removable),
 );
 
 $categories.on(update, (categories, { current, previous }) =>

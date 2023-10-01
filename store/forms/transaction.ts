@@ -125,7 +125,7 @@ function createIncomeExpenseForm() {
     source: { form: $form, type: $type },
     filter: and(
       $validation.map(isSuccessful),
-      $type.map((t) => t !== TransactionType.Transfer)
+      $type.map((t) => t !== TransactionType.Transfer),
     ),
     fn: ({ form, type }) => createTransaction(form, type),
     target: transactions.create,
@@ -180,7 +180,7 @@ function createTransferForm() {
 
   const errorMessages = {
     additional: "",
-    amount: "Requred, must be numeric",
+    amount: "Required, must be numeric",
     from: "Required",
     to: "Required",
   };
@@ -237,13 +237,13 @@ function createTransferForm() {
     fn: (form) => {
       if (!form.from) {
         throw new Error(
-          `Account from money must be transfered has not been specified`
+          `Account from money must be transfered has not been specified`,
         );
       }
 
       if (!form.to) {
         throw new Error(
-          `Account to money must be transfered has not been specified`
+          `Account to money must be transfered has not been specified`,
         );
       }
 

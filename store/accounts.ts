@@ -2,7 +2,6 @@ import { persist } from "@effector-storage/react-native-async-storage";
 import { Store, combine, createEvent, createStore } from "effector";
 import _ from "lodash";
 
-import { SystemCategories } from "./categories";
 import * as currencies from "./currencies";
 import * as transactions from "./transactions";
 import { Account, AccountID, Accounts, Balances } from "./types";

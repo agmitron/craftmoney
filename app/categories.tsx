@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { Screens } from "./navigation";
-import { categories } from "../store";
+import { appearance, categories } from "../store";
 
 import Button from "~/components/Button";
 import Select from "~/components/Select";
@@ -27,6 +27,11 @@ const Categories: React.FC = () => {
 
     return [root, ...rest].join(".") || null;
   }, [route]);
+
+  const emoji = useStoreMap(
+    appearance.Emoji.$emoji,
+    ({ categories }) => categories
+  );
 
   const _categories = useStoreMap(categories.$categories, (categories) => {
     if (!currentCategory) {
@@ -53,28 +58,17 @@ const Categories: React.FC = () => {
     return navigation.navigate(Screens.TransactionsCreate as never);
   };
 
-  const createCategory = () => {
-// TODO
-  };
-
   return (
     <View style={styles.root}>
-      <Button
-        onPress={createCategory}
-        variant="contained"
-        style={{ width: "50%" }}
-      >
-        Create
-      </Button>
       {currentCategory && (
         <Select
           title={currentCategory}
           onPress={() => onPress(currentCategory, "select")}
-          emoji="👍"
+          emoji={emoji[currentCategory] ?? "⚠️"}
           style={{ backgroundColor: "white", borderRadius: 10 }} // TODO
         />
       )}
-      <Typography>Subcategories</Typography>
+      {currentCategory && <Typography>Subcategories</Typography>}
       {Object.keys(_categories).map((c) => {
         const subcategories = Object.keys(_categories?.[c] ?? {});
         return (
@@ -82,7 +76,7 @@ const Categories: React.FC = () => {
             key={c}
             title={c}
             onPress={() => onPress(c, "dive")}
-            emoji="👀"
+            emoji={emoji[c] ?? "⚠️"}
             style={{ backgroundColor: "white", borderRadius: 10 }} // TODO
             description={subcategories.join("•")}
           />
@@ -104,7 +98,6 @@ const withTheme = (t: Theme) =>
       height: 1,
       backgroundColor: "grey",
       display: "flex",
-      // marginTop: 50,
       marginBottom: 50,
     },
   });

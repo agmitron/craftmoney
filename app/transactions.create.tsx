@@ -23,7 +23,7 @@ import TextField from "~/components/TextField";
 import { useTheme } from "~/components/Themed";
 import Typography from "~/components/Typography";
 import { Theme } from "~/constants/theme";
-import { categories } from "~/store";
+import { appearance, categories } from "~/store";
 import {
   $type,
   TransactionType,
@@ -46,7 +46,7 @@ interface Action {
 // TODO: make dynamic
 const useAdditionalActions = (
   setAdditional: (value: Omit<Additional, "timestamp">) => void,
-  $additional: Store<Additional>,
+  $additional: Store<Additional>
 ) => {
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -58,7 +58,7 @@ const useAdditionalActions = (
 
         const date = useStoreMap(
           $additional,
-          ({ timestamp }) => new Date(timestamp),
+          ({ timestamp }) => new Date(timestamp)
         );
 
         return (
@@ -142,7 +142,7 @@ export const TransferForm = () => {
 
   const additionalActions = useAdditionalActions(
     transferForm.setAdditional,
-    transferForm.$additional,
+    transferForm.$additional
   );
 
   return (
@@ -280,14 +280,15 @@ export const IncomeExpenseForm = () => {
   const navigation = useNavigation();
   const category = useStore(incomeExpenseForm.$category);
   const account = useStore(incomeExpenseForm.$account);
+  const emoji = useStore(appearance.Emoji.$emoji);
   const type = useStore($type);
   const amount = useStore(incomeExpenseForm.$amount);
   const isDisabled = useStoreMap(incomeExpenseForm.$validation, isFailed);
   const validation = useStore(incomeExpenseForm.$validation);
 
-  const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/")),
-  );
+  // const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
+  //   Object.keys(flattenCategories(categories, "", {}, "/")),
+  // );
 
   const onTypeChange = (newType: TransactionType) => {
     if (Platform.OS !== "web") {
@@ -298,7 +299,7 @@ export const IncomeExpenseForm = () => {
 
   const additionalActions = useAdditionalActions(
     incomeExpenseForm.setAdditional,
-    incomeExpenseForm.$additional,
+    incomeExpenseForm.$additional
   );
 
   useEffect(() => {
@@ -379,6 +380,7 @@ export const IncomeExpenseForm = () => {
         <Select
           title="Category"
           description={category ?? "Tap to select"}
+          emoji={emoji.categories?.[category ?? ""] ?? "❔"}
           style={styles.select}
           onPress={
             () => navigation.navigate(Screens.Categories as never) // TODO: ????
@@ -397,6 +399,7 @@ export const IncomeExpenseForm = () => {
         <Select
           title="Account"
           description={account?.name ?? "Tap to select"}
+          emoji={emoji.accounts?.[account?.id ?? ""] ?? "❔"}
           style={styles.select}
           onPress={
             () => navigation.navigate(Screens.Accounts as never) // TODO: ????

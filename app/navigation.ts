@@ -1,4 +1,3 @@
-import _ from "lodash";
 import {
   CardStyleInterpolators,
   StackCardInterpolatedStyle,
@@ -63,7 +62,7 @@ export function forHorizontalModal({
       outputRange: [layouts.screen.width, 0],
       extrapolate: "clamp",
     }),
-    inverted
+    inverted,
   );
 
   const translateUnfocused = next
@@ -73,7 +72,7 @@ export function forHorizontalModal({
           outputRange: [0, layouts.screen.width * -0.3],
           extrapolate: "clamp",
         }),
-        inverted
+        inverted,
       )
     : 0;
 
@@ -83,11 +82,11 @@ export function forHorizontalModal({
     extrapolate: "clamp",
   });
 
-  const shadowOpacity = current.progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.3],
-    extrapolate: "clamp",
-  });
+  // const shadowOpacity = current.progress.interpolate({
+  //   inputRange: [0, 1],
+  //   outputRange: [0, 0.3],
+  //   extrapolate: "clamp",
+  // });
 
   iOSStandardModal.cardStyle.transform = [
     // Translation for the animation of the current card

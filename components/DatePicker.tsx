@@ -12,26 +12,26 @@ interface Props {
 }
 
 const DatePicker: React.FC<Props> = (props) => {
-  // if (Platform.OS === "web") {
-  //   const ref = createRef<HTMLInputElement>();
+  if (Platform.OS === "web") {
+    const ref = createRef<HTMLInputElement>();
 
-  //   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     const date = new Date(e.target.value);
-  //     props.onConfirm?.(date);
-  //   };
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const date = new Date(e.target.value);
+      props.onConfirm?.(date);
+    };
 
-  //   const onBlur = () => {
-  //     props.onCancel?.();
-  //   };
+    const onBlur = () => {
+      props.onCancel?.();
+    };
 
-  //   return createElement("input", {
-  //     type: "datetime-local",
-  //     onChange,
-  //     onBlur,
-  //     value: formatDateToISOString(props.date),
-  //     ref,
-  //   });
-  // }
+    return createElement("input", {
+      type: "datetime-local",
+      onChange,
+      onBlur,
+      value: formatDateToISOString(props.date),
+      ref,
+    });
+  }
 
   return (
     <RNDatePicker

@@ -1,99 +1,21 @@
-import { useStore, useStoreMap } from "effector-react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
+import { ScrollView, StyleSheet } from "react-native";
 
-import AccountsWidget from "~/components/AccountsWidget";
-import Button from "~/components/Button";
-import Card from "~/components/Card";
-import Typography from "~/components/Typography";
-import { accounts, transactions } from "~/store";
+import AccountsWidget from "~/widgets/accounts";
+import TransactionsWidget from "~/widgets/transactions";
 
-export default function TabOneScreen() {
-  const _accounts = useStore(accounts.$accounts);
-  const allTransactions = useStoreMap(
-    transactions.$transactions,
-    (transactions) => Object.values(transactions).flat()
-  );
-
+export default function Home() {
   return (
-    <View style={styles.root}>
-      <ScrollView>
-        <AccountsWidget />
-
-        {/* <View style={styles.transactions}>
-          <Typography variant="title">Transactions</Typography>
-          {allTransactions.map((tx) => (
-            <View style={{ width: "100%" }} key={tx.id}>
-              <Swipeable
-                key={tx.id}
-                renderRightActions={() => (
-                  <Button onPress={() => transactions.remove(tx)}>
-                    Delete
-                  </Button>
-                )}
-              >
-                <Card
-                  // TODO: refactor styles
-                  style={{
-                    width: "100%",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    paddingVertical: 20,
-                  }}
-                >
-                  <View style={{ rowGap: 5 }}>
-                    <Typography variant="title">{tx.category}</Typography>
-                    <Typography variant="subtitle">
-                      {_accounts[tx.account].name}
-                    </Typography>
-                  </View>
-                  <View style={{ rowGap: 5 }}>
-                    <Typography variant="title" align="right">
-                      {tx.amount} {_accounts[tx.account].currency}
-                    </Typography>
-                    <Typography variant="subtitle" align="right">
-                      {new Date(tx.additional.timestamp).toLocaleDateString()}
-                    </Typography>
-                  </View>
-                </Card>
-              </Swipeable>
-            </View>
-          ))}
-        </View> */}
-      </ScrollView>
-    </View>
+    <ScrollView contentContainerStyle={styles.root}>
+      <AccountsWidget />
+      <TransactionsWidget />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    flexBasis: "100%",
-    // overflow: "hidden",
-    // padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-  accounts: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 20,
-    // maxWidth: "100%",
-    flexBasis: "100%",
-  },
-  transactions: {
-    width: "100%",
-    rowGap: 20,
-    marginTop: 20,
+    padding: 15,
   },
 });

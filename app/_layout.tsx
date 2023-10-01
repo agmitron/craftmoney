@@ -7,10 +7,16 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import { CardStyleInterpolators } from "@react-navigation/stack";
-import { useStoreMap } from "effector-react";
+import { useStore, useStoreMap } from "effector-react";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
-import { Image, StyleSheet, View, useColorScheme } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+  useColorScheme,
+} from "react-native";
 
 import TabOneScreen from "./(tabs)";
 import TabTwoScreen from "./(tabs)/two";
@@ -23,14 +29,14 @@ import { Screens, screensWithTabs, Stack } from "./navigation";
 import CreateTransaction from "./transactions.create";
 import { useTheme } from "../components/Themed";
 import { Theme } from "../constants/theme";
-import { accounts, categories } from "../store";
+import { accounts, categories, currencies } from "../store";
 import { flattenCategories } from "../utils/categories";
 
 import Button from "~/components/Button";
 import Typography from "~/components/Typography";
 import { incomeExpenseForm, transferForm } from "~/store/forms/transaction";
 
-export default function RootLayout() {
+export default function Layout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -45,7 +51,7 @@ export default function RootLayout() {
     <>
       {/* Keep the splash screen open until the assets have loaded. In the future, we should just support async font loading with a native version of font-display. */}
       {/* {!loaded && <SplashScreen />} */}
-      {loaded && <RootLayoutNav />}
+      {loaded && <Routing />}
     </>
   );
 }
@@ -54,15 +60,18 @@ export const Tabs = () => {
   const theme = useTheme();
   const styles = withTheme(theme);
 
-  const totalBalance = useStoreMap(accounts.$totalBalance, (b) => b.toFixed(2));
+  const balance = useStoreMap(accounts.$totalBalance, (b) => b.toFixed(2));
+  const currency = useStore(currencies.$primary);
   const { navigate } = useNavigation();
 
   return (
-    <View style={styles.navbar}>
+    <View style={styles.tabs}>
       {/* TODO: Typings, styles */}
       <View style={{ rowGap: 10 }}>
         <Typography variant="text">Total balance</Typography>
-        <Typography variant="title">{totalBalance}</Typography>
+        <Typography variant="title">
+          {balance} {currency}
+        </Typography>
       </View>
       {/* TODO: reuse */}
       <Button
@@ -92,7 +101,7 @@ function useTabs<T>(
   const Container = (_: T) => {
     const route = useRoute();
     return (
-      <View style={styles.root}>
+      <View style={styles.screen}>
         <Component />
         {screensWithTabs.has(route.name) && <Tabs />}
       </View>
@@ -102,7 +111,7 @@ function useTabs<T>(
   return Container;
 }
 
-function RootLayoutNav() {
+function Routing() {
   const colorScheme = useColorScheme();
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -114,7 +123,32 @@ function RootLayoutNav() {
   const tabOne = useTabs(TabOneScreen);
   const tabTwo = useTabs(TabTwoScreen);
 
-  const { navigate } = useNavigation();
+  // TODO
+  const categoriesScreenOptions =
+    ({ parent = "" }) =>
+    ({ navigation }) => ({
+      presentation: "modal",
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      headerRight: (_) => (
+        <Pressable
+          style={{
+            // TODO
+            borderColor: theme.colors.surface,
+            borderWidth: 1,
+            width: 25,
+            height: 25,
+            borderRadius: 25 / 2,
+            alignItems: "center",
+            marginRight: 10,
+          }}
+          onPress={() =>
+            navigation.navigate(Screens.CategoriesCreate, { parent })
+          }
+        >
+          <Typography>+</Typography>
+        </Pressable>
+      ),
+    });
 
   return (
     <View style={styles.root}>
@@ -187,10 +221,7 @@ function RootLayoutNav() {
             <Stack.Screen
               name={Screens.Categories}
               component={Categories}
-              options={{
-                presentation: "modal",
-                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              }}
+              options={categoriesScreenOptions({ parent: "" })}
             />
             <Stack.Screen
               name={Screens.CategoriesCreate}
@@ -202,12 +233,7 @@ function RootLayoutNav() {
                 key={cs}
                 name={`categories/${cs}`}
                 component={Categories}
-                options={{
-                  headerTitle: "Categories",
-                  presentation: "modal",
-                  cardStyleInterpolator:
-                    CardStyleInterpolators.forHorizontalIOS,
-                }}
+                options={categoriesScreenOptions({ parent: cs })}
               />
             ))}
           </Stack.Group>
@@ -223,11 +249,15 @@ const withTheme = (t: Theme) =>
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      // width: "100%",
       height: "100%",
       flex: 1,
     },
-    navbar: {
+    screen: {
+      flex: 1,
+      justifyContent: "space-between",
+      height: "100%",
+    },
+    tabs: {
       paddingVertical: 30,
       paddingHorizontal: 20,
       borderTopWidth: 1,
@@ -236,11 +266,6 @@ const withTheme = (t: Theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      // width: "100%",
       backgroundColor: "white",
-    },
-    navbar__button_bordered: {
-      borderRightWidth: 1,
-      borderRightColor: t.colors.surface,
     },
   });

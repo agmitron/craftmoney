@@ -270,10 +270,10 @@ describe("Categories", () => {
     expect(categories.$categories.getState()).not.toEqual(initialCategories);
     expect(categories.$categories.getState()).not.toBe(null);
     expect(
-      categories.$categories.getState()?.food?.restaurants?.["Taco Bell"]
+      categories.$categories.getState()?.food?.restaurants?.["Taco Bell"],
     ).not.toBeUndefined();
     expect(
-      categories.$categories.getState()?.food?.restaurants?.["Taco Bell"]
+      categories.$categories.getState()?.food?.restaurants?.["Taco Bell"],
     ).toBe(null);
   });
 
@@ -281,7 +281,7 @@ describe("Categories", () => {
     categories.remove(["food.restaurants.Taco Bell", "food.restaurants.kfc"]);
 
     expect(
-      _.get(categories.$categories.getState(), "food.restaurants")
+      _.get(categories.$categories.getState(), "food.restaurants"),
     ).toEqual({ mcdonalds: null });
   });
 
@@ -292,7 +292,7 @@ describe("Categories", () => {
     });
 
     expect(
-      _.get(categories.$categories.getState(), "investments.crypto")
+      _.get(categories.$categories.getState(), "investments.crypto"),
     ).toEqual({
       altcoins: null,
       web3: null,

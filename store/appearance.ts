@@ -1,5 +1,6 @@
 import { persist } from "@effector-storage/react-native-async-storage";
 import { createEvent, createStore } from "effector";
+import _ from "lodash";
 
 export namespace Emoji {
   export enum Section {
@@ -7,17 +8,29 @@ export namespace Emoji {
     Categories = "categories",
   }
 
-  export type Emoji = {
+  export interface SetEmoji {
+    path: string;
+    emoji: string;
+  }
+
+  export type EmojiStore = {
     [section in Section]: {
       [key: string]: string;
     };
   };
 
-  export const $emoji = createStore<Emoji>({
+  export const $emoji = createStore<EmojiStore>({
     accounts: {},
     categories: {},
   });
+
   persist({ key: "$appearance.emoji", store: $emoji });
+
+  export const setEmoji = createEvent<SetEmoji>();
+
+  $emoji.on(setEmoji, (previous, { path, emoji }) =>
+    _.set(previous, path, emoji)
+  );
 }
 
 export namespace Accounts {

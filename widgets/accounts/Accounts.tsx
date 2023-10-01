@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { useStore, useStoreMap } from "effector-react";
+import { useMemo, useState } from "react";
 import {
   Image,
   Pressable,
@@ -8,25 +9,24 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import Swiper from "react-native-swiper";
 
-import Button from "./Button";
-import CardComponent from "./Card";
-import { useTheme } from "./Themed";
-import Typography from "./Typography";
+import Button from "../../components/Button";
+import CardComponent from "../../components/Card";
+import { useTheme } from "../../components/Themed";
+import Typography from "../../components/Typography";
 
 import { Screens } from "~/app/navigation";
 import { Theme } from "~/constants/theme";
 import { accounts, appearance } from "~/store";
 import { Account, Accounts, Balances } from "~/store/types";
-import { useMemo, useState } from "react";
 import { takeRange } from "~/utils/range";
-import Swiper from "react-native-swiper";
 
 namespace Views {
   interface Props {
     accounts: Accounts;
     balances: Balances;
-    emoji: appearance.Emoji.Emoji[keyof appearance.Emoji.Emoji];
+    emoji: appearance.Emoji.EmojiStore["accounts"];
     edit: (account: Account) => void;
     create: () => void;
   }
@@ -142,71 +142,78 @@ namespace Views {
     });
 
     return (
-      <Swiper
-        style={{ maxHeight }}
-        dotStyle={{ marginTop: "auto", marginBottom: 0 }}
-        activeDotStyle={{ marginTop: "auto", marginBottom: 0 }}
-      >
-        {pages.map((accountsOnPage, page) => (
-          <View
-            key={page}
-            style={[styles.container_plates__page]}
-            onLayout={(e) => setMaxHeight(e.nativeEvent.layout.height + 30)}
-          >
-            {accountsOnPage.map((account) => (
-              <CardComponent
-                style={styles.container_plates__plate}
-                key={account.id}
-              >
-                <Pressable onPress={() => edit(account)}>
-                  <Typography variant="text" style={{ fontSize: 25 }}>
-                    {emoji[account.id]}
-                  </Typography>
-                  <Typography variant="subtitle">{account.name}</Typography>
-                  <Typography variant="subtitle">
-                    {balances[account.id]} {account.currency}
-                  </Typography>
-                </Pressable>
-              </CardComponent>
-            ))}
-            {page === lastPage && (
-              <CardComponent
-                style={[
-                  styles.container_plates__plate,
-                  styles.container_plates__plate_add,
-                ]}
-              >
-                <Pressable
-                  onPress={create}
-                  style={{ alignItems: "center", rowGap: 10 }}
+      <View style={{ maxHeight }}>
+        <Swiper
+          style={{ maxHeight }}
+          contentContainerStyle={{ maxHeight }}
+          dotStyle={{ marginTop: "auto", marginBottom: 0 }}
+          activeDotStyle={{ marginTop: "auto", marginBottom: 0 }}
+        >
+          {pages.map((accountsOnPage, page) => (
+            <View
+              key={page}
+              style={[styles.container_plates__page, { maxHeight }]}
+              onLayout={(e) =>
+                setMaxHeight((prev) =>
+                  prev === null ? e.nativeEvent.layout.height + 30 : prev
+                )
+              }
+            >
+              {accountsOnPage.map((account) => (
+                <CardComponent
+                  style={styles.container_plates__plate}
+                  key={account.id}
                 >
-                  <Button
-                    variant="icon"
+                  <Pressable onPress={() => edit(account)}>
+                    <Typography variant="text" style={{ fontSize: 25 }}>
+                      {emoji[account.id]}
+                    </Typography>
+                    <Typography variant="subtitle">{account.name}</Typography>
+                    <Typography variant="subtitle">
+                      {balances[account.id]} {account.currency}
+                    </Typography>
+                  </Pressable>
+                </CardComponent>
+              ))}
+              {page === lastPage && (
+                <CardComponent
+                  style={[
+                    styles.container_plates__plate,
+                    styles.container_plates__plate_add,
+                  ]}
+                >
+                  <Pressable
                     onPress={create}
-                    style={{
-                      marginTop: "auto",
-                      marginBottom: "auto",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
+                    style={{ alignItems: "center", rowGap: 10 }}
                   >
-                    <Image
-                      source={require("../assets/images/plus.png")}
+                    <Button
+                      variant="icon"
+                      onPress={create}
                       style={{
-                        // TODO
-                        width: 40,
-                        height: 45,
-                        margin: 0,
+                        marginTop: "auto",
+                        marginBottom: "auto",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
-                    />
-                  </Button>
-                  <Typography variant="subtitle">Add account</Typography>
-                </Pressable>
-              </CardComponent>
-            )}
-          </View>
-        ))}
-      </Swiper>
+                    >
+                      <Image
+                        source={require("~/assets/images/plus.png")}
+                        style={{
+                          // TODO
+                          width: 40,
+                          height: 45,
+                          margin: 0,
+                        }}
+                      />
+                    </Button>
+                    <Typography variant="subtitle">Add account</Typography>
+                  </Pressable>
+                </CardComponent>
+              )}
+            </View>
+          ))}
+        </Swiper>
+      </View>
     );
   };
 }
@@ -255,16 +262,15 @@ const withTheme = (t: Theme) =>
     container_card: {},
     container_plates: {},
     container_plates__page: {
-      // flex: 1,
       display: "flex",
       flexWrap: "wrap",
       flexDirection: "row",
       alignContent: "flex-start",
+      paddingBottom: 30,
       gap: 5,
-      padding: 15,
     },
     container_plates__plate: {
-      flexBasis: "49%",
+      width: "49%",
       height: 100,
     },
     container_plates__plate_add: {

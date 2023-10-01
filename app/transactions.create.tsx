@@ -13,7 +13,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { Screens } from "./_layout";
+import { Screens } from "./navigation";
 
 import Button from "~/components/Button";
 import Card from "~/components/Card";
@@ -23,6 +23,7 @@ import TextField from "~/components/TextField";
 import { useTheme } from "~/components/Themed";
 import Typography from "~/components/Typography";
 import { Theme } from "~/constants/theme";
+import { appearance, categories } from "~/store";
 import {
   $type,
   TransactionType,
@@ -31,6 +32,7 @@ import {
   transferForm,
 } from "~/store/forms/transaction";
 import { Additional } from "~/store/types";
+import { flattenCategories } from "~/utils/categories";
 import { isFailed } from "~/utils/validation";
 
 interface ActionComponentProps {
@@ -51,7 +53,7 @@ const useAdditionalActions = (
 
   const additionalActions: Action[] = [
     {
-      Component: ({ key }) => {
+      Component: () => {
         const [isOpen, setOpen] = useState(false);
 
         const date = useStoreMap(
@@ -60,7 +62,7 @@ const useAdditionalActions = (
         );
 
         return (
-          <View key={key} style={styles["additional__list-item"]}>
+          <View style={styles["additional__list-item"]}>
             <DatePicker
               isOpen={isOpen}
               date={date}
@@ -75,14 +77,11 @@ const useAdditionalActions = (
       },
     },
     {
-      Component: ({ key }) => {
+      Component: () => {
         const note = useStoreMap($additional, ({ note }) => note);
-
-        console.log({ note });
 
         return (
           <View
-            key={key}
             style={[
               styles["additional__list-item"],
               styles["additional__list-item_last"],
@@ -281,10 +280,15 @@ export const IncomeExpenseForm = () => {
   const navigation = useNavigation();
   const category = useStore(incomeExpenseForm.$category);
   const account = useStore(incomeExpenseForm.$account);
+  const emoji = useStore(appearance.Emoji.$emoji);
   const type = useStore($type);
   const amount = useStore(incomeExpenseForm.$amount);
   const isDisabled = useStoreMap(incomeExpenseForm.$validation, isFailed);
   const validation = useStore(incomeExpenseForm.$validation);
+
+  // const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
+  //   Object.keys(flattenCategories(categories, "", {}, "/")),
+  // );
 
   const onTypeChange = (newType: TransactionType) => {
     if (Platform.OS !== "web") {
@@ -376,6 +380,7 @@ export const IncomeExpenseForm = () => {
         <Select
           title="Category"
           description={category ?? "Tap to select"}
+          emoji={emoji.categories?.[category ?? ""] ?? "❔"}
           style={styles.select}
           onPress={
             () => navigation.navigate(Screens.Categories as never) // TODO: ????
@@ -394,6 +399,7 @@ export const IncomeExpenseForm = () => {
         <Select
           title="Account"
           description={account?.name ?? "Tap to select"}
+          emoji={emoji.accounts?.[account?.id ?? ""] ?? "❔"}
           style={styles.select}
           onPress={
             () => navigation.navigate(Screens.Accounts as never) // TODO: ????

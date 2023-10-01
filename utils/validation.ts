@@ -31,5 +31,5 @@ export const isFailed = <T extends Form>(
 export const preparedRules = {
   pass: () => true,
   notNull: (v: any) => v !== null,
-  notEmptyString: (v: string) => v.length > 0
+  notEmptyString: (v: string) => v.length > 0,
 };

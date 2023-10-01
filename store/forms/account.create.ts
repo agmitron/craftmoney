@@ -1,4 +1,5 @@
 import { combine, createEvent, createStore, sample } from "effector";
+import { nanoid } from "nanoid";
 import { reset } from "patronum";
 
 import * as accounts from "~/store/accounts";
@@ -61,6 +62,11 @@ sample({
   clock: submit,
   source: $form,
   filter: $validation.map(isSuccessful),
-  fn: (form) => ({ currency: form.currency, name: form.name }),
+  fn: (form) => ({
+    currency: form.currency,
+    name: form.name,
+    id: nanoid(),
+    emoji: "👍",
+  }),
   target: accounts.create,
 });

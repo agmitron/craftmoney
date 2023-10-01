@@ -1,100 +1,21 @@
-import { Link, useNavigation } from "@react-navigation/native";
-import { useStore, useStoreMap } from "effector-react";
-import { Pressable, StyleSheet, View } from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
+import { ScrollView, StyleSheet } from "react-native";
 
-import { Screens } from "~/app/_layout";
-import Button from "~/components/Button";
-import Card from "~/components/Card";
-import Typography from "~/components/Typography";
-import { accounts, transactions } from "~/store";
+import AccountsWidget from "~/widgets/accounts";
+import TransactionsWidget from "~/widgets/transactions";
 
-export default function TabOneScreen() {
-  const _accounts = useStore(accounts.$accounts);
-  const _balances = useStore(accounts.$balances);
-  const allTransactions = useStoreMap(
-    transactions.$transactions,
-    (transactions) => Object.values(transactions).flat()
-  );
-
-  const { navigate } = useNavigation();
-
+export default function Home() {
   return (
-    <View style={styles.root}>
-      <View style={styles.accounts}>
-        {Object.values(_accounts).map((account, key) => (
-          <Pressable
-            key={key}
-            onPress={() =>
-              navigate(...([`accounts/edit`, { id: account.id }] as never))
-            }
-          >
-            <Card style={styles.account}>
-              <Typography variant="title">{account.name}</Typography>
-              <Typography variant="subtitle">
-                {_balances[account.id]} {account.currency}
-              </Typography>
-            </Card>
-          </Pressable>
-        ))}
-        <Card style={styles.account_create}>
-          <Typography variant="title">Create a new account</Typography>
-          <Button
-            variant="contained"
-            style={{ width: "100%" }}
-            onPress={() => navigate(Screens.AccountsCreate as never)}
-          >
-            +
-          </Button>
-        </Card>
-      </View>
-
-      <View style={styles.transactions}>
-        {allTransactions.map((tx) => (
-          <Swipeable
-            key={tx.id}
-            renderRightActions={() => (
-              <Button onPress={() => transactions.remove(tx)}>Delete</Button>
-            )}
-          >
-            <Card>
-              <Typography variant="title">{tx.category}</Typography>
-              <Typography variant="subtitle">
-                {_accounts[tx.account].name}
-              </Typography>
-              <Typography variant="text">{tx.amount}</Typography>
-            </Card>
-          </Swipeable>
-        ))}
-      </View>
-    </View>
+    <ScrollView contentContainerStyle={styles.root}>
+      <AccountsWidget />
+      <TransactionsWidget />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
+    padding: 15,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-  accounts: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 20,
-  },
-  account: {},
-  account_create: {
-    rowGap: 20,
-  },
-  transactions: {},
 });

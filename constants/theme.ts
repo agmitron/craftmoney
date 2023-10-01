@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 export interface Theme {
   colors: {
     primary: string;
@@ -10,12 +12,16 @@ export interface Theme {
     };
   };
   borderRadius: number;
+  layout: {
+    plates: number;
+  };
 }
 
+// TODO: make dynamic
 const themes: Record<"light" | "dark", Theme> = {
   light: {
     colors: {
-      primary: "#6E85E3",
+      primary: "#5a56cf",
       surface: "#F0F0F6",
       background: "#FFFFFF",
       typography: {
@@ -25,6 +31,9 @@ const themes: Record<"light" | "dark", Theme> = {
       },
     },
     borderRadius: 10,
+    layout: {
+      plates: 4,
+    },
   },
   dark: {
     // TODO
@@ -39,6 +48,9 @@ const themes: Record<"light" | "dark", Theme> = {
       },
     },
     borderRadius: 10,
+    layout: {
+      plates: 4,
+    },
   },
 };
 

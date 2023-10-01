@@ -2,23 +2,43 @@ import { sample } from "effector";
 import _ from "lodash";
 
 import * as accounts from "./accounts";
+import * as appearance from "./appearance";
 import * as categories from "./categories";
+import * as currencies from "./currencies";
 import * as transactions from "./transactions";
 
 sample({
   clock: accounts.create,
   source: accounts.$accounts,
   fn: (previousAccounts, newAccount) => {
-    const id = accounts.generateAccountID(previousAccounts);
     return {
       ...previousAccounts,
-      [id]: {
+      [newAccount.id]: {
         ...newAccount,
-        id,
       },
     };
   },
   target: accounts.$accounts,
+});
+
+sample({
+  clock: accounts.create,
+  source: transactions.$transactions,
+  fn: (txs, account) => ({
+    ...txs,
+    [account.id]: [],
+  }),
+  target: transactions.$transactions,
+});
+
+sample({
+  clock: accounts.create,
+  source: appearance.Emoji.$emoji,
+  fn: (emoji, account) => ({
+    ...emoji,
+    accounts: { ...emoji.accounts, [account.id]: account.emoji },
+  }),
+  target: appearance.Emoji.$emoji,
 });
 
 sample({
@@ -31,37 +51,12 @@ sample({
 sample({
   clock: accounts.update,
   source: accounts.$accounts,
-  fn: (accounts, { id, account }) => {
+  fn: (accounts, { id, upd }) => {
     const previousAccount = accounts[id];
-    const newAccount = { ...previousAccount, ...account };
+    const newAccount = { ...previousAccount, ...upd };
     return { ...accounts, [id]: newAccount };
   },
   target: accounts.$accounts,
-});
-
-sample({
-  clock: accounts.create,
-  source: { balances: accounts.$balances, accounts: accounts.$accounts },
-  fn: ({ balances, accounts }) =>
-    Object.keys(accounts).reduce(
-      (accumulator, accountID) => ({
-        ...accumulator,
-        [accountID]: balances[accountID] ?? 0,
-      }),
-      {}
-    ),
-  target: accounts.$balances,
-});
-
-sample({
-  clock: transactions.create,
-  source: accounts.$balances,
-  fn: (balances, transaction) => {
-    const previousBalance = balances[transaction.account];
-    const newBalance = previousBalance + transaction.amount;
-    return { ...balances, [transaction.account]: newBalance };
-  },
-  target: accounts.$balances,
 });
 
 sample({
@@ -70,7 +65,7 @@ sample({
   fn: (previous, tx) => {
     const previousTransactions = transactions.getAccountTransactions(
       previous,
-      tx.account
+      tx.account,
     );
     const newTransactions = [
       ...previousTransactions,
@@ -87,13 +82,25 @@ sample({
 
 sample({
   clock: transactions.transfer,
-  source: transactions.$transactions,
-  fn: (previous, tx) => {
-    const previousFrom = transactions.getAccountTransactions(previous, tx.from);
-    const previousTo = transactions.getAccountTransactions(previous, tx.to);
+  source: {
+    txs: transactions.$transactions,
+    rates: currencies.$rates,
+    accounts: accounts.$accounts,
+  },
+  fn: ({ txs, rates, accounts }, tx) => {
+    const previousFrom = transactions.getAccountTransactions(txs, tx.from);
+    const previousTo = transactions.getAccountTransactions(txs, tx.to);
+    const sender = accounts[tx.from];
+    const receiver = accounts[tx.to];
+
+    const senderCurrencyRate = rates?.[sender.currency] ?? 1;
+    const primaryCurrencyAmount = tx.amount / senderCurrencyRate;
+
+    const receiverCurrencyRate = rates?.[receiver.currency] ?? 1;
+    const toReceive = primaryCurrencyAmount * receiverCurrencyRate;
 
     return {
-      ...previous,
+      ...txs,
       [tx.from]: [
         ...previousFrom,
         {
@@ -109,7 +116,7 @@ sample({
         {
           account: tx.to,
           additional: tx.additional,
-          amount: tx.amount,
+          amount: toReceive,
           category: categories.SystemCategories.Transfer,
           id: previousTo.length.toString(),
         },
@@ -119,20 +126,6 @@ sample({
   target: transactions.$transactions,
 });
 
-sample({
-  clock: transactions.transfer,
-  source: accounts.$balances,
-  fn: (balances, tx) => {
-    const prevBalanceTo = balances[tx.to] ?? 0;
-    const prevBalanceFrom = balances[tx.from] ?? 0;
+currencies.requestRates();
 
-    return {
-      ...balances,
-      [tx.from]: prevBalanceFrom - tx.amount,
-      [tx.to]: prevBalanceTo + tx.amount,
-    };
-  },
-  target: accounts.$balances,
-});
-
-export { accounts, transactions, categories };
+export { accounts, transactions, categories, appearance, currencies };

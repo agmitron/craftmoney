@@ -1,6 +1,6 @@
+import RNDatePicker from "@react-native-community/datetimepicker";
 import { createElement, createRef } from "react";
 import { Platform } from "react-native";
-import RNDatePicker from "react-native-date-picker";
 
 import { formatDateToISOString } from "~/utils/date";
 
@@ -35,10 +35,10 @@ const DatePicker: React.FC<Props> = (props) => {
 
   return (
     <RNDatePicker
-      open={props.isOpen}
-      date={props.date}
-      onConfirm={props.onConfirm}
-      onCancel={props.onCancel}
+      value={props.date}
+      onChange={({ nativeEvent: { timestamp } }) =>
+        props.onConfirm?.(timestamp ? new Date(timestamp) : new Date())
+      }
     />
   );
 };

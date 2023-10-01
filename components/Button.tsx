@@ -9,10 +9,11 @@ import {
 } from "react-native";
 
 import { useTheme } from "./Themed";
-import { Theme } from "../constants/theme";
 import { assertStyle } from "../utils/style";
 
-type Variant = "contained" | "outlined";
+import { Theme } from "~/constants/theme";
+
+type Variant = "contained" | "outlined" | "icon";
 type Size = "small" | "medium" | "large";
 
 interface Props extends PressableProps {
@@ -65,6 +66,17 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
     variant_outlined: {
       borderRadius: t.borderRadius,
     },
+    variant_icon: {
+      width: 40,
+      height: 40,
+      borderRadius: 40 / 2,
+      paddingVertical: 0,
+      paddingHorizontal: 0,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: t.colors.primary,
+    },
     size_small: {},
     size_medium: {},
     size_large: {},
@@ -77,11 +89,15 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
     },
     text: {
       color:
-        variant === "contained"
+        variant === "contained" || variant === "icon"
           ? t.colors.typography.inverted
           : t.colors.primary,
-      textAlign: "center",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
       fontSize: size === "large" ? 20 : 16,
+      fontWeight: variant === "icon" ? "bold" : "normal",
+      textAlign: "center",
     },
     common: {
       paddingVertical: 10,

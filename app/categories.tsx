@@ -1,18 +1,18 @@
-import { Link, useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
 import _ from "lodash";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Screens } from "./_layout";
-import { categories } from "../store";
+import { Screens } from "./navigation";
+import { appearance, categories } from "../store";
 
+import Button from "~/components/Button";
 import Select from "~/components/Select";
 import { useTheme } from "~/components/Themed";
+import Typography from "~/components/Typography";
 import { Theme } from "~/constants/theme";
 import { incomeExpenseForm } from "~/store/forms/transaction";
-import CreateCategory from "./categories.create";
-import Button from "~/components/Button";
 
 const Categories: React.FC = () => {
   const route = useRoute();
@@ -27,6 +27,11 @@ const Categories: React.FC = () => {
 
     return [root, ...rest].join(".") || null;
   }, [route]);
+
+  const emoji = useStoreMap(
+    appearance.Emoji.$emoji,
+    ({ categories }) => categories
+  );
 
   const _categories = useStoreMap(categories.$categories, (categories) => {
     if (!currentCategory) {
@@ -53,43 +58,46 @@ const Categories: React.FC = () => {
     return navigation.navigate(Screens.TransactionsCreate as never);
   };
 
-  const createCategory = () => {
-    navigation.navigate(
-      ...([Screens.CategoriesCreate, { parent: currentCategory }] as never)
-    ); // TODO
-  };
-
   return (
-    <View>
-      <Button onPress={createCategory}>Create</Button>
+    <View style={styles.root}>
       {currentCategory && (
         <Select
           title={currentCategory}
           onPress={() => onPress(currentCategory, "select")}
-          emoji="👍"
+          emoji={emoji[currentCategory] ?? "⚠️"}
+          style={{ backgroundColor: "white", borderRadius: 10 }} // TODO
         />
       )}
-      <View style={styles.separator} />
-      {Object.keys(_categories).map((c) => (
-        <Select
-          key={c}
-          title={c}
-          onPress={() => onPress(c, "dive")}
-          emoji="👀"
-        />
-      ))}
+      {currentCategory && <Typography>Subcategories</Typography>}
+      {Object.keys(_categories).map((c) => {
+        const subcategories = Object.keys(_categories?.[c] ?? {});
+        return (
+          <Select
+            key={c}
+            title={c}
+            onPress={() => onPress(c, "dive")}
+            emoji={emoji[c] ?? "⚠️"}
+            style={{ backgroundColor: "white", borderRadius: 10 }} // TODO
+            description={subcategories.join("•")}
+          />
+        );
+      })}
     </View>
   );
 };
 
 const withTheme = (t: Theme) =>
   StyleSheet.create({
+    root: {
+      rowGap: 20,
+      paddingHorizontal: 15,
+      paddingVertical: 15,
+    },
     separator: {
       width: "100%",
       height: 1,
       backgroundColor: "grey",
       display: "flex",
-      // marginTop: 50,
       marginBottom: 50,
     },
   });

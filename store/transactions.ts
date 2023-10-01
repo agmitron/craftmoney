@@ -12,6 +12,12 @@ import {
 export const $transactions = createStore<Transactions>({});
 persist({ store: $transactions, key: "$transactions" });
 
+export const $allTransactions = $transactions.map((transactions) => {
+  return Object.values(transactions)
+    .flat()
+    .sort((a, b) => a.additional.timestamp - b.additional.timestamp);
+});
+
 export const create = createEvent<Omit<Transaction, "id">>();
 export const transfer = createEvent<{
   from: AccountID;
@@ -35,7 +41,3 @@ $transactions.on(remove, (previous, tx) => ({
   ...previous,
   [tx.account]: previous[tx.account]?.filter(({ id }) => id !== tx.id) ?? [],
 }));
-
-remove.watch(console.log);
-
-$transactions.watch(console.log);

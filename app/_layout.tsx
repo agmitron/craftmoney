@@ -2,16 +2,21 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
-  Link,
-  NavigationContainer,
   ThemeProvider,
+  useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useStoreMap } from "effector-react";
+import { CardStyleInterpolators } from "@react-navigation/stack";
+import { useStore, useStoreMap } from "effector-react";
 import { useFonts } from "expo-font";
-import { useEffect, useMemo } from "react";
-import { StyleSheet, Text, View, useColorScheme } from "react-native";
+import { useEffect } from "react";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+  useColorScheme,
+} from "react-native";
 
 import TabOneScreen from "./(tabs)";
 import TabTwoScreen from "./(tabs)/two";
@@ -20,38 +25,18 @@ import CreateAccount from "./accounts.create";
 import EditAccount from "./accounts.edit";
 import Categories from "./categories";
 import CreateCategory from "./categories.create";
+import { Screens, screensWithTabs, Stack } from "./navigation";
 import CreateTransaction from "./transactions.create";
 import { useTheme } from "../components/Themed";
 import { Theme } from "../constants/theme";
-import { categories } from "../store";
+import { accounts, categories, currencies } from "../store";
 import { flattenCategories } from "../utils/categories";
 
+import Button from "~/components/Button";
+import Typography from "~/components/Typography";
 import { incomeExpenseForm, transferForm } from "~/store/forms/transaction";
-import { AccountID, Category } from "~/store/types";
 
-export const enum Screens {
-  Home = "home",
-  Second = "second",
-  TransactionsCreate = "transactions/create",
-  Categories = "categories",
-  CategoriesCreate = "categories/create",
-  Accounts = "accounts",
-  AccountsTransferTo = "accounts/transfer/to",
-  AccountsTransferFrom = "accounts/transfer/from",
-  AccountsCreate = "accounts/create",
-  AccountsEdit = "accounts/edit",
-}
-
-export type RootStackParamList = {
-  [Screens.AccountsEdit]: { id: AccountID };
-  [Screens.CategoriesCreate]: { parent: Category };
-};
-
-export const Stack = createNativeStackNavigator<RootStackParamList>();
-
-const screensWithTabs = new Set<string>([Screens.Home, Screens.Second]);
-
-export default function RootLayout() {
+export default function Layout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -66,7 +51,7 @@ export default function RootLayout() {
     <>
       {/* Keep the splash screen open until the assets have loaded. In the future, we should just support async font loading with a native version of font-display. */}
       {/* {!loaded && <SplashScreen />} */}
-      {loaded && <RootLayoutNav />}
+      {loaded && <Routing />}
     </>
   );
 }
@@ -75,35 +60,40 @@ export const Tabs = () => {
   const theme = useTheme();
   const styles = withTheme(theme);
 
+  const balance = useStoreMap(accounts.$totalBalance, (b) => b.toFixed(2));
+  const currency = useStore(currencies.$primary);
+  const { navigate } = useNavigation();
+
   return (
-    <View style={styles.navbar}>
-      {/* TODO: Typings */}
-      <Link
-        to={{ screen: Screens.Second as "second" }}
-        style={[styles.navbar__button]}
+    <View style={styles.tabs}>
+      {/* TODO: Typings, styles */}
+      <View style={{ rowGap: 10 }}>
+        <Typography variant="text">Total balance</Typography>
+        <Typography variant="title">
+          {balance} {currency}
+        </Typography>
+      </View>
+      {/* TODO: reuse */}
+      <Button
+        variant="icon"
+        onPress={() => navigate(Screens.TransactionsCreate as never)} // TODO: typings
       >
-        <Text>Two</Text>
-      </Link>
-      {/* TODO: Typings */}
-      <Link
-        to={{ screen: Screens.TransactionsCreate as "transactions/create" }}
-        style={[styles.navbar__button, styles.navbar__button_icon]}
-      >
-        <Text>+</Text>
-      </Link>
-      {/* TODO: Typings */}
-      <Link
-        to={{ screen: Screens.Home as "home" }}
-        style={styles.navbar__button}
-      >
-        <Text>Home</Text>
-      </Link>
+        <Image
+          source={require("../assets/images/plus.png")}
+          style={{
+            // TODO
+            width: 40,
+            height: 45,
+            margin: 0,
+          }}
+        />
+      </Button>
     </View>
   );
 };
 
 function useTabs<T>(
-  Component: () => React.ReactElement,
+  Component: () => React.ReactElement
 ): (props: T) => React.ReactElement {
   const theme = useTheme();
   const styles = withTheme(theme);
@@ -111,7 +101,7 @@ function useTabs<T>(
   const Container = (_: T) => {
     const route = useRoute();
     return (
-      <View style={styles.root}>
+      <View style={styles.screen}>
         <Component />
         {screensWithTabs.has(route.name) && <Tabs />}
       </View>
@@ -121,99 +111,118 @@ function useTabs<T>(
   return Container;
 }
 
-const useLinking = (categoriesScreens: string[] = []) => {
-  const linking = useMemo(() => {
-    const result = {
-      config: {
-        screens: {
-          [Screens.Home]: "/",
-          [Screens.TransactionsCreate]: "transactions/create",
-          [Screens.Second]: "two",
-          [Screens.Categories]: "categories",
-          [Screens.Accounts]: "accounts",
-          [Screens.AccountsTransferFrom]: "accounts/transfer/from",
-          [Screens.AccountsTransferTo]: "accounts/transfer/to",
-          [Screens.AccountsCreate]: "accounts/create",
-        } as Record<string, string>,
-      },
-      prefixes: [],
-    };
-
-    for (const cs of categoriesScreens) {
-      const route = `${Screens.Categories}/${cs}`;
-      result.config.screens[route] = route;
-    }
-
-    return result;
-  }, []);
-
-  return linking;
-};
-
-function RootLayoutNav() {
+function Routing() {
   const colorScheme = useColorScheme();
   const theme = useTheme();
   const styles = withTheme(theme);
 
   const categoriesScreens = useStoreMap(categories.$categories, (categories) =>
-    Object.keys(flattenCategories(categories, "", {}, "/")),
+    Object.keys(flattenCategories(categories, "", {}, "/"))
   );
-
-  const linking = useLinking(categoriesScreens);
 
   const tabOne = useTabs(TabOneScreen);
   const tabTwo = useTabs(TabTwoScreen);
 
-  return (
-    <NavigationContainer linking={linking}>
-      <View style={styles.root}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+  // TODO
+  const categoriesScreenOptions =
+    ({ parent = "" }) =>
+    ({ navigation }) => ({
+      presentation: "modal",
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      headerRight: (_) => (
+        <Pressable
+          style={{
+            // TODO
+            borderColor: theme.colors.surface,
+            borderWidth: 1,
+            width: 25,
+            height: 25,
+            borderRadius: 25 / 2,
+            alignItems: "center",
+            marginRight: 10,
+          }}
+          onPress={() =>
+            navigation.navigate(Screens.CategoriesCreate, { parent })
+          }
         >
-          <Stack.Navigator>
+          <Typography>+</Typography>
+        </Pressable>
+      ),
+    });
+
+  return (
+    <View style={styles.root}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack.Navigator>
+          <Stack.Group>
             <Stack.Screen
               name={Screens.Home}
-              // options={{ headerShown: false }}
+              options={{ headerTitle: "Finance" }}
               component={tabOne}
             />
             <Stack.Screen
-              name={Screens.Second}
-              // options={{ headerShown: false }}
+              name={Screens.Settings}
+              options={{ headerTitle: "Settings" }}
               component={tabTwo}
             />
+          </Stack.Group>
+
+          <Stack.Group
+            screenOptions={{
+              presentation: "modal",
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+            }}
+          >
             <Stack.Screen
               name={Screens.TransactionsCreate}
               options={{
                 presentation: "modal",
+                headerTitle: "Add a transaction",
               }}
               component={CreateTransaction}
             />
 
             <Stack.Screen
               name={Screens.Accounts}
-              component={() => (
+              options={{
+                headerTitle: "Choose an account",
+              }}
+              children={() => (
                 <Accounts onChange={incomeExpenseForm.selectAccount} />
               )}
             />
 
             <Stack.Screen
               name={Screens.AccountsTransferFrom}
-              component={() => <Accounts onChange={transferForm.selectFrom} />}
+              options={{
+                headerTitle: "Transfer from",
+              }}
+              children={() => <Accounts onChange={transferForm.selectFrom} />}
             />
 
             <Stack.Screen
               name={Screens.AccountsTransferTo}
-              component={() => <Accounts onChange={transferForm.selectTo} />}
+              options={{
+                headerTitle: "Transfer to",
+              }}
+              children={() => <Accounts onChange={transferForm.selectTo} />}
             />
 
             <Stack.Screen
               name={Screens.AccountsCreate}
+              options={{
+                headerTitle: "Add an account",
+              }}
               component={CreateAccount}
             />
 
             <Stack.Screen name={Screens.AccountsEdit} component={EditAccount} />
 
-            <Stack.Screen name={Screens.Categories} component={Categories} />
+            <Stack.Screen
+              name={Screens.Categories}
+              component={Categories}
+              options={categoriesScreenOptions({ parent: "" })}
+            />
             <Stack.Screen
               name={Screens.CategoriesCreate}
               component={CreateCategory}
@@ -224,12 +233,13 @@ function RootLayoutNav() {
                 key={cs}
                 name={`categories/${cs}`}
                 component={Categories}
+                options={categoriesScreenOptions({ parent: cs })}
               />
             ))}
-          </Stack.Navigator>
-        </ThemeProvider>
-      </View>
-    </NavigationContainer>
+          </Stack.Group>
+        </Stack.Navigator>
+      </ThemeProvider>
+    </View>
   );
 }
 
@@ -239,37 +249,23 @@ const withTheme = (t: Theme) =>
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      width: "100%",
+      height: "100%",
+      flex: 1,
+    },
+    screen: {
+      flex: 1,
+      justifyContent: "space-between",
       height: "100%",
     },
-    navbar: {
+    tabs: {
+      paddingVertical: 30,
+      paddingHorizontal: 20,
+      borderTopWidth: 1,
+      borderTopColor: "rgb(217 217 220)",
       display: "flex",
       flexDirection: "row",
-      justifyContent: "center",
+      justifyContent: "space-between",
       alignItems: "center",
-      height: 50,
-      width: "100%",
       backgroundColor: "white",
-    },
-    navbar__button: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "50%",
-      height: "100%",
-      textAlign: "center",
-      textAlignVertical: "center",
-    },
-    navbar__button_bordered: {
-      borderRightWidth: 1,
-      borderRightColor: t.colors.surface,
-    },
-    navbar__button_icon: {
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      borderColor: "black",
-      borderWidth: 1,
     },
   });

@@ -1,28 +1,55 @@
 import { persist } from "@effector-storage/react-native-async-storage";
-import { createEvent, createStore } from "effector";
+import { Store, combine, createEvent, createStore } from "effector";
 import _ from "lodash";
 
+import * as currencies from "./currencies";
+import * as transactions from "./transactions";
 import { Account, AccountID, Accounts, Balances } from "./types";
 
-export const $accounts = createStore<Accounts>({
-  // 0: { currency: "THB", name: "THB", id: "0" },
-  // 1: { currency: "USD", name: "USD", id: "1" },
-  // 2: { currency: "RUB", name: "RUB", id: "2" },
-});
-persist({ store: $accounts, key: "$accounts" });
-export const $balances = createStore<Balances>({});
-persist({ store: $balances, key: "$balances" });
+interface Create extends Account {
+  emoji: string;
+}
 
-export const create = createEvent<Omit<Account, "id">>();
+export const $accounts = createStore<Accounts>({});
+persist({ store: $accounts, key: "$accounts" });
+// TODO: simplify
+export const $balances: Store<Balances> = combine(
+  transactions.$transactions,
+  (transactions) => {
+    return Object.entries(transactions).reduce<Balances>(
+      (balances, [accountID, txs]) => {
+        return {
+          ...balances,
+          [accountID]: txs.reduce<number>((b, { amount }) => {
+            return b + amount;
+          }, 0),
+        };
+      },
+      {},
+    );
+  },
+);
+
+export const $totalBalance = combine(
+  $balances,
+  currencies.$rates,
+  $accounts,
+  (balances, rates, accounts) => {
+    return Object.values(accounts).reduce<number>((total, account) => {
+      const balance = balances[account.id];
+      const rate = rates?.[account.currency] ?? 1;
+      return total + balance / rate;
+    }, 0);
+  },
+);
+
+export const create = createEvent<Create>();
 export const remove = createEvent<AccountID>();
 export const reset = createEvent();
 export const update = createEvent<{
   id: AccountID;
   upd: Partial<Account>;
 }>();
-
-export const generateAccountID = (accounts: Accounts): AccountID =>
-  _.size(accounts).toString();
 
 $accounts.reset(reset);
 

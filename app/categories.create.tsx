@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import { RootStackParamList, Screens } from "./_layout";
+import { RootStackParamList, Screens } from "./navigation";
 
 import Button from "~/components/Button";
 import TextField from "~/components/TextField";
@@ -26,13 +26,17 @@ const CreateCategory = () => {
 
   const name = useStore(form.$name);
   const parent = useStore(form.$parent);
+  const emoji = useStore(form.$emoji);
   const isDisabled = useStoreMap(form.$validation, isFailed);
 
   const route =
     useRoute<RouteProp<RootStackParamList, Screens.CategoriesCreate>>();
 
   useEffect(() => {
-    form.setParent(route.params.parent);
+    if (route?.params?.parent) {
+      const parent = route?.params?.parent.replaceAll("/", ".");
+      form.setParent(parent);
+    }
   }, [route.params]);
 
   const onSubmit = () => {
@@ -54,7 +58,7 @@ const CreateCategory = () => {
               variant="filled"
               placeholder="Name"
               size="large"
-              keyboardType="number-pad"
+              keyboardType="default"
               returnKeyType="done"
               onChangeText={form.setName}
               value={name}
@@ -65,6 +69,13 @@ const CreateCategory = () => {
               size="large"
               onChangeText={form.setParent}
               value={parent}
+            />
+
+            <TextField
+              placeholder="Emoji"
+              size="large"
+              onChangeText={form.setEmoji}
+              value={emoji}
             />
 
             <Button size="large" onPress={onSubmit} disabled={isDisabled}>

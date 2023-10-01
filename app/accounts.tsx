@@ -2,7 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
 import { View } from "react-native";
 
-import { Screens } from "./_layout";
+import { Screens } from "./navigation";
 import { accounts } from "../store";
 
 import Select from "~/components/Select";
@@ -18,7 +18,7 @@ const Accounts: React.FC<Props> = ({
 }) => {
   const navigation = useNavigation();
   const _accounts = useStoreMap(accounts.$accounts, (accounts) =>
-    Object.values(accounts)
+    Object.values(accounts),
   );
 
   const onPress = (account: Account) => {

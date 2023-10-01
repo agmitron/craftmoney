@@ -168,8 +168,8 @@ namespace Views {
                     <Typography variant="text" style={{ fontSize: 25 }}>
                       {emoji[account.id]}
                     </Typography>
-                    <Typography variant="subtitle">{account.name}</Typography>
-                    <Typography variant="subtitle">
+                    <Typography variant="text">{account.name}</Typography>
+                    <Typography variant="text" style={{ fontWeight: "bold" }}>
                       {balances[account.id]} {account.currency}
                     </Typography>
                   </Pressable>
@@ -206,7 +206,7 @@ namespace Views {
                         }}
                       />
                     </Button>
-                    <Typography variant="subtitle">Add account</Typography>
+                    <Typography variant="text">Add an account</Typography>
                   </Pressable>
                 </CardComponent>
               )}

@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import Card from "~/components/Card";
 import Typography from "~/components/Typography";
 import { accounts, appearance, transactions } from "~/store";
+import { Category } from "~/store/types";
 
 const TransactionsWidget = () => {
   const allTransactions = useStore(transactions.$allTransactions);
@@ -12,6 +13,11 @@ const TransactionsWidget = () => {
     ({ categories }) => categories
   );
   const _accounts = useStore(accounts.$accounts);
+
+  const cutCategory = (c: Category) => {
+    return c.split(".").pop();
+  };
+
   return (
     <View style={styles.root}>
       {allTransactions.map(({ account, amount, category, id, additional }) => (
@@ -22,7 +28,7 @@ const TransactionsWidget = () => {
             </Typography>
           </View>
           <View style={styles.transaction__left}>
-            <Typography variant="subtitle">{category}</Typography>
+            <Typography variant="subtitle">{cutCategory(category)}</Typography>
             <Typography variant="text">{_accounts[account].name}</Typography>
           </View>
           <View style={styles.transaction__right}>

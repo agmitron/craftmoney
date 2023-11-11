@@ -10,7 +10,9 @@ interface Props {
 const { width } = Dimensions.get("screen");
 
 const Pagination: React.FC<Props> = ({ pages, scrollX }) => {
-  console.log({ pages });
+  if (pages.length <= 1) {
+    return null;
+  }
 
   return (
     <View style={styles.root}>

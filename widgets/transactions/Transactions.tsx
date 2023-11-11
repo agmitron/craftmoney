@@ -20,6 +20,7 @@ const TransactionsWidget = () => {
 
   return (
     <View style={styles.root}>
+      <Typography variant="title">Transactions</Typography>
       {allTransactions.map(({ account, amount, category, id, additional }) => (
         <Card key={id} style={styles.transaction}>
           <View style={styles.transaction__icon}>
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     rowGap: 10,
+    padding: 5,
   },
   transaction: {
     flexDirection: "row",

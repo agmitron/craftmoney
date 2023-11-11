@@ -16,6 +16,6 @@ const styles = StyleSheet.create({
   root: {
     alignItems: "center",
     justifyContent: "flex-start",
-    padding: 15,
+    rowGap: 20,
   },
 });

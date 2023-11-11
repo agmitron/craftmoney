@@ -1,15 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { useStore, useStoreMap } from "effector-react";
-import { useMemo, useState } from "react";
-import {
-  Image,
-  Pressable,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from "react-native";
-import Swiper from "react-native-swiper";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 import Button from "../../components/Button";
 import CardComponent from "../../components/Card";
@@ -17,6 +8,7 @@ import { useTheme } from "../../components/Themed";
 import Typography from "../../components/Typography";
 
 import { Screens } from "~/app/navigation";
+import Slider from "~/components/Slider/Slider";
 import { Theme } from "~/constants/theme";
 import { accounts, appearance } from "~/store";
 import { Account, Accounts, Balances } from "~/store/types";
@@ -125,40 +117,25 @@ namespace Views {
   }) => {
     const theme = useTheme();
     const styles = withTheme(theme);
-    const [maxHeight, setMaxHeight] = useState<number | null>(null);
 
     const _accounts = Object.values(accounts);
 
     const pagesCount = Math.ceil(
-      Object.keys(accounts).length / theme.layout.plates
+      (Object.keys(accounts).length + 1) / theme.layout.plates.perPage,
     );
     const lastPage = pagesCount - 1;
 
     const pages = new Array(pagesCount).fill(null).map((_, page) => {
-      const maxPlatesOnPage =
-        page === lastPage ? theme.layout.plates - 1 : theme.layout.plates;
+      const maxPlatesOnPage = theme.layout.plates.perPage;
 
       return takeRange(_accounts, maxPlatesOnPage, page);
     });
 
     return (
-      <View style={{ maxHeight }}>
-        <Swiper
-          style={{ maxHeight }}
-          contentContainerStyle={{ maxHeight }}
-          dotStyle={{ marginTop: "auto", marginBottom: 0 }}
-          activeDotStyle={{ marginTop: "auto", marginBottom: 0 }}
-        >
-          {pages.map((accountsOnPage, page) => (
-            <View
-              key={page}
-              style={[styles.container_plates__page, { maxHeight }]}
-              onLayout={(e) =>
-                setMaxHeight((prev) =>
-                  prev === null ? e.nativeEvent.layout.height + 30 : prev
-                )
-              }
-            >
+      <View style={styles.container}>
+        <Slider
+          pages={pages.map((accountsOnPage, page) => (
+            <View style={[styles.container_plates__page]}>
               {accountsOnPage.map((account) => (
                 <CardComponent
                   style={styles.container_plates__plate}
@@ -212,7 +189,7 @@ namespace Views {
               )}
             </View>
           ))}
-        </Swiper>
+        />
       </View>
     );
   };
@@ -225,7 +202,7 @@ const AccountsWidget: React.FC = () => {
   const _balances = useStore(accounts.$balances);
   const _emoji = useStoreMap(
     appearance.Emoji.$emoji,
-    ({ accounts }) => accounts
+    ({ accounts }) => accounts,
   );
 
   const { navigate } = useNavigation();
@@ -253,20 +230,25 @@ const AccountsWidget: React.FC = () => {
 };
 
 // TODO: refactor and reuse
-const withTheme = (t: Theme) =>
-  StyleSheet.create({
+const withTheme = (t: Theme) => {
+  const maxContainerHeight =
+    (t.layout.plates.perPage / t.layout.plates.rows) *
+      Number(t.layout.plates.height) +
+    50;
+
+  return StyleSheet.create({
     container: {
       flexDirection: "row",
       alignSelf: "flex-start",
+      maxHeight: maxContainerHeight,
     },
     container_card: {},
-    container_plates: {},
     container_plates__page: {
       display: "flex",
-      flexWrap: "wrap",
       flexDirection: "row",
-      alignContent: "flex-start",
-      paddingBottom: 30,
+      width: "100%",
+      flexWrap: "wrap",
+      padding: 5,
       gap: 5,
     },
     container_plates__plate: {
@@ -277,5 +259,6 @@ const withTheme = (t: Theme) =>
       backgroundColor: "rgba(255, 255, 255, .5)",
     },
   });
+};
 
 export default AccountsWidget;

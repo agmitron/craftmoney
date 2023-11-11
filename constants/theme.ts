@@ -1,5 +1,3 @@
-import { Platform } from "react-native";
-
 export interface Theme {
   colors: {
     primary: string;
@@ -13,7 +11,12 @@ export interface Theme {
   };
   borderRadius: number;
   layout: {
-    plates: number;
+    plates: {
+      perPage: number;
+      width: number | string;
+      height: number | string;
+      rows: number;
+    };
   };
 }
 
@@ -32,7 +35,12 @@ const themes: Record<"light" | "dark", Theme> = {
     },
     borderRadius: 10,
     layout: {
-      plates: 4,
+      plates: {
+        perPage: 4,
+        width: "49%",
+        height: 100,
+        rows: 2,
+      },
     },
   },
   dark: {
@@ -49,7 +57,12 @@ const themes: Record<"light" | "dark", Theme> = {
     },
     borderRadius: 10,
     layout: {
-      plates: 4,
+      plates: {
+        perPage: 4,
+        width: "49%",
+        height: 100,
+        rows: 2,
+      },
     },
   },
 };

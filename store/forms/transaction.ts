@@ -1,5 +1,5 @@
 import { combine, createEvent, createStore, sample } from "effector";
-import { and } from "patronum";
+import { and, reset } from "patronum";
 
 import { transactions } from "../index";
 import { Account, Additional, Category, Transaction } from "../types";
@@ -125,7 +125,7 @@ function createIncomeExpenseForm() {
     source: { form: $form, type: $type },
     filter: and(
       $validation.map(isSuccessful),
-      $type.map((t) => t !== TransactionType.Transfer),
+      $type.map((t) => t !== TransactionType.Transfer)
     ),
     fn: ({ form, type }) => createTransaction(form, type),
     target: transactions.create,
@@ -191,7 +191,7 @@ function createTransferForm() {
   const setAdditional = createEvent<Omit<Additional, "timestamp">>();
   const submit = createEvent();
   const validate = createEvent();
-  const reset = createEvent();
+  const resetForm = createEvent();
 
   $from.on(selectFrom, (_, account) => account);
   $to.on(selectTo, (_, account) => account);
@@ -205,6 +205,8 @@ function createTransferForm() {
     clock: [$from, $to, $amount, $additional, submit],
     target: validate,
   });
+
+  reset({ clock: resetForm, target: [$from, $to, $amount, $additional] });
 
   sample({
     clock: validate,
@@ -237,13 +239,13 @@ function createTransferForm() {
     fn: (form) => {
       if (!form.from) {
         throw new Error(
-          `Account from money must be transfered has not been specified`,
+          `Account from money must be transfered has not been specified`
         );
       }
 
       if (!form.to) {
         throw new Error(
-          `Account to money must be transfered has not been specified`,
+          `Account to money must be transfered has not been specified`
         );
       }
 
@@ -268,7 +270,7 @@ function createTransferForm() {
     setAmount,
     setAdditional,
     submit,
-    reset,
+    reset: resetForm,
     errorMessages,
   };
 }

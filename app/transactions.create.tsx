@@ -142,7 +142,7 @@ export const TransferForm = () => {
 
   const additionalActions = useAdditionalActions(
     transferForm.setAdditional,
-    transferForm.$additional
+    transferForm.$additional,
   );
 
   return (

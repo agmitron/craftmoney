@@ -15,7 +15,7 @@ persist({ store: $transactions, key: "$transactions" });
 export const $allTransactions = $transactions.map((transactions) => {
   return Object.values(transactions)
     .flat()
-    .sort((a, b) => a.additional.timestamp - b.additional.timestamp);
+    .sort((a, b) => b.additional.timestamp - a.additional.timestamp);
 });
 
 export const create = createEvent<Omit<Transaction, "id">>();

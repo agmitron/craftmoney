@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
 import { View } from "react-native";

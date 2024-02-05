@@ -2,7 +2,7 @@
   "expo": {
     "name": "craftmoney",
     "slug": "craftmoney",
-    "version": "1.0.1",
+    "version": "1.0.11",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -20,7 +20,8 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.agmitron.craftmoney"
+      "bundleIdentifier": "com.agmitron.craftmoney",
+      "infoPlist": { "UIBackgroundModes": ["remote-notification"] }
     },
     "android": {
       "adaptiveIcon": {

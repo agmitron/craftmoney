@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useStoreMap } from "effector-react";
 import _ from "lodash";

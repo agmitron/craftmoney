@@ -1,7 +1,8 @@
+import "react-native-gesture-handler";
 import { Link } from "@react-navigation/native";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Stack } from "./_layout";
+import { Stack } from "./navigation";
 
 export default function NotFoundScreen() {
   return (

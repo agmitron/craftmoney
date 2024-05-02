@@ -2,7 +2,7 @@ import RNDatePicker from "@react-native-community/datetimepicker";
 import { createElement, createRef } from "react";
 import { Platform } from "react-native";
 
-import { formatDateToISOString } from "~/utils/date";
+import { formatDateToISOString } from "~/shared/utils/date";
 
 interface Props {
   isOpen: boolean;

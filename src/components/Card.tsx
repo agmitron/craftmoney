@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
-import { assertStyle } from "../utils/style";
+import { assertStyle } from "../shared/utils/style";
 
 interface Props {
   style?: StyleProp<ViewStyle>;

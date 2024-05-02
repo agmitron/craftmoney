@@ -12,7 +12,7 @@ import {
 import { useTheme } from "./Themed";
 import Typography from "./Typography";
 import { Theme } from "../constants/theme";
-import { assertStyle } from "../utils/style";
+import { assertStyle } from "../shared/utils/style";
 
 interface Props {
   title: string;

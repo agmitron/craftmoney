@@ -13,7 +13,7 @@ import Slider from "~/components/Slider/Slider";
 import { Theme } from "~/constants/theme";
 import { accounts, appearance } from "~/entities";
 import { Account, Accounts, Balances } from "~/entities/types";
-import { takeRange } from "~/utils/range";
+import { takeRange } from "~/shared/utils/range";
 
 namespace Views {
   interface Props {

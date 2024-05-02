@@ -3,7 +3,7 @@ import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
 
 import { useTheme } from "./Themed";
 import { Theme } from "../constants/theme";
-import { assertStyle } from "../utils/style";
+import { assertStyle } from "../shared/utils/style";
 
 interface Props extends TextInputProps {
   decorations?: {

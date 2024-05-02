@@ -32,7 +32,7 @@ import {
   transferForm,
 } from "~/entities/forms/transaction";
 import { Additional } from "~/entities/types";
-import { isFailed } from "~/utils/validation";
+import { isFailed } from "~/shared/utils/validation";
 
 interface ActionComponentProps {
   key: string | number;

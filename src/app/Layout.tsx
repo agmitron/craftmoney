@@ -27,7 +27,7 @@ import SettingsPage from "../pages/Settings";
 import Accounts from "../pages/accounts";
 import Categories from "../pages/categories";
 import { Screens, screensWithTabs, Stack } from "./navigation";
-import { flattenCategories } from "../utils/categories";
+import { flattenCategories } from "../shared/utils/categories";
 
 import Button from "~/components/Button";
 import Typography from "~/components/Typography";

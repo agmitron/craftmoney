@@ -17,7 +17,7 @@ import TextField from "~/components/TextField";
 import { useTheme } from "~/components/Themed";
 import { Theme } from "~/constants/theme";
 import * as form from "~/entities/forms/categories.create";
-import { isFailed } from "~/utils/validation";
+import { isFailed } from "~/shared/utils/validation";
 
 const CreateCategory = () => {
   const theme = useTheme();

@@ -9,7 +9,7 @@ import {
   Rules,
   isSuccessful,
   preparedRules,
-} from "~/utils/validation";
+} from "~/shared/utils/validation";
 
 interface Form {
   name: string;

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "./Themed";
-import { assertStyle } from "../utils/style";
+import { assertStyle } from "../shared/utils/style";
 
 import { Theme } from "~/constants/theme";
 

@@ -14,7 +14,7 @@ const Card: React.FC<PropsWithChildren<Props>> = ({ children, style }) => {
 const styles = StyleSheet.create({
   root: {
     backgroundColor: "white",
-    borderRadius: 12,
+    borderRadius: 20,
     paddingVertical: 14,
     paddingHorizontal: 18,
   },

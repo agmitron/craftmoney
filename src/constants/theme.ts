@@ -1,4 +1,5 @@
 export interface Theme {
+  spacing: number;
   colors: {
     primary: string;
     surface: string;
@@ -33,7 +34,7 @@ const themes: Record<"light" | "dark", Theme> = {
         inverted: "white",
       },
     },
-    borderRadius: 10,
+    borderRadius: 15,
     layout: {
       plates: {
         perPage: 4,
@@ -42,6 +43,7 @@ const themes: Record<"light" | "dark", Theme> = {
         rows: 2,
       },
     },
+    spacing: 12,
   },
   dark: {
     // TODO
@@ -64,6 +66,7 @@ const themes: Record<"light" | "dark", Theme> = {
         rows: 2,
       },
     },
+    spacing: 12,
   },
 };
 

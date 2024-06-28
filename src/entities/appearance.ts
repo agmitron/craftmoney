@@ -40,7 +40,7 @@ export namespace Accounts {
     Card,
   }
 
-  export const $view = createStore<View>(View.Plates);
+  export const $view = createStore<View>(View.Card);
   persist({ key: "$appearance.accounts.view", store: $view });
 
   export const setView = createEvent<View>();

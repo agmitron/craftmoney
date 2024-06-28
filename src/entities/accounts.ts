@@ -10,7 +10,17 @@ interface Create extends Account {
   emoji: string;
 }
 
-export const $accounts = createStore<Accounts>({});
+// TODO:
+const testAccountID = "test-account-id";
+const testAccount: Account = {
+  id: testAccountID,
+  currency: "USD",
+  name: "Test Account",
+};
+
+export const $accounts = createStore<Accounts>({
+  [testAccountID]: testAccount,
+});
 persist({ store: $accounts, key: "$accounts" });
 // TODO: simplify
 export const $balances: Store<Balances> = combine(
@@ -25,9 +35,9 @@ export const $balances: Store<Balances> = combine(
           }, 0),
         };
       },
-      {},
+      {}
     );
-  },
+  }
 );
 
 export const $totalBalance = combine(
@@ -40,7 +50,7 @@ export const $totalBalance = combine(
       const rate = rates?.[account.currency] ?? 1;
       return total + balance / rate;
     }, 0);
-  },
+  }
 );
 
 export const create = createEvent<Create>();

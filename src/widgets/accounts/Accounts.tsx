@@ -1,13 +1,9 @@
-import { useNavigation } from "@react-navigation/native";
 import { useStore, useStoreMap } from "effector-react";
 
 import Views from "./views";
 
-import { Screens } from "~/app/navigation";
 import { accounts, appearance } from "~/entities";
-import { Account } from "~/entities/types";
 
-// TODO: FSD
 const AccountsWidget: React.FC = () => {
   const _view = useStore(appearance.Accounts.$view);
   const _accounts = useStore(accounts.$accounts);
@@ -17,11 +13,8 @@ const AccountsWidget: React.FC = () => {
     ({ accounts }) => accounts,
   );
 
-  const { navigate } = useNavigation();
-
-  const create = () => navigate(Screens.AccountsCreate as never); // TODO: Types
-  const edit = (account: Account) =>
-    navigate(...([Screens.AccountsEdit, { id: account.id }] as never));
+  const create = () => {};
+  const edit = () => {};
 
   const props = {
     accounts: _accounts,

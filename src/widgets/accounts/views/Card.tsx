@@ -59,7 +59,6 @@ const withTheme = (t: Theme, cardWidth: number) => {
     root: {
       flex: 1,
       width: "100%",
-      padding: t.spacing,
     },
     card: {
       width: "100%",

@@ -1,7 +1,13 @@
-import Layout from "./Layout";
+import { SafeAreaView } from "react-native";
+
+import HomePage from "~/pages/Home";
 
 const App = () => {
-  return <Layout />;
+  return (
+    <SafeAreaView>
+      <HomePage />
+    </SafeAreaView>
+  );
 };
 
 export default App;

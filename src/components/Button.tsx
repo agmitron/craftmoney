@@ -5,6 +5,7 @@ import {
   StyleProp,
   StyleSheet,
   Text,
+  View,
   ViewStyle,
 } from "react-native";
 
@@ -20,6 +21,7 @@ interface Props extends PressableProps {
   variant?: Variant;
   style?: StyleProp<ViewStyle>;
   size?: Size;
+  icon?: React.ReactNode;
 }
 
 const Button: React.FC<PropsWithChildren<Props>> = ({
@@ -28,6 +30,7 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
   variant = "contained",
   size = "small",
   disabled = false,
+  icon,
   ...props
 }) => {
   const [isActive, setActive] = useState(false);
@@ -52,13 +55,31 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
       disabled={disabled}
       {...props}
     >
+      <View style={styles.icon_container}>
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          {variant === "icon" && icon}
+        </View>
+      </View>
       <Text style={styles.text}>{children}</Text>
     </Pressable>
   );
 };
 
-const withTheme = (t: Theme, variant: Variant, size: Size) =>
-  StyleSheet.create({
+const withTheme = (t: Theme, variant: Variant, size: Size) => {
+  const textColorOptions: Record<Variant, string> = {
+    contained: t.colors.background,
+    outlined: t.colors.primary,
+    icon: t.colors.primary,
+  };
+
+  return StyleSheet.create({
     variant_contained: {
       backgroundColor: t.colors.primary,
       borderRadius: t.borderRadius,
@@ -67,15 +88,7 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
       borderRadius: t.borderRadius,
     },
     variant_icon: {
-      width: 40,
-      height: 40,
-      borderRadius: 40 / 2,
-      paddingVertical: 0,
-      paddingHorizontal: 0,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: t.colors.primary,
+      borderColor: "transparent",
     },
     size_small: {},
     size_medium: {},
@@ -85,19 +98,16 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
     },
     _disabled: {
       opacity: 0.5,
-      cursor: "not-allowed",
     },
     text: {
-      color:
-        variant === "contained" || variant === "icon"
-          ? t.colors.typography.inverted
-          : t.colors.primary,
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      fontSize: size === "large" ? 20 : 16,
-      fontWeight: variant === "icon" ? "bold" : "normal",
+      fontSize: size === "large" ? 20 : 14,
       textAlign: "center",
+      color: textColorOptions[variant],
+      fontWeight: variant === "icon" ? "bold" : "normal",
+      marginTop: variant === "icon" ? 5 : 0,
     },
     common: {
       paddingVertical: 10,
@@ -105,6 +115,11 @@ const withTheme = (t: Theme, variant: Variant, size: Size) =>
       borderColor: t.colors.primary,
       borderWidth: 1,
     },
+    icon_container: {
+      justifyContent: "center",
+      flexDirection: "column",
+    },
   });
+};
 
 export default Button;

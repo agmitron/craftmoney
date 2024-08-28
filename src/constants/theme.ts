@@ -26,10 +26,10 @@ const themes: Record<"light" | "dark", Theme> = {
   light: {
     colors: {
       primary: "#5a56cf",
-      surface: "#F0F0F6",
+      surface: "#f2f4f8",
       background: "#FFFFFF",
       typography: {
-        primary: "#0F1323",
+        primary: "#007aff",
         secondary: "#C1C1D6",
         inverted: "white",
       },

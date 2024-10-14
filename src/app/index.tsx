@@ -1,12 +1,12 @@
-import { SafeAreaView } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 
-import HomePage from "~/pages/Home";
+import Navigation from "./navigation";
 
 const App = () => {
   return (
-    <SafeAreaView>
-      <HomePage />
-    </SafeAreaView>
+    <NavigationContainer>
+      <Navigation />
+    </NavigationContainer>
   );
 };
 

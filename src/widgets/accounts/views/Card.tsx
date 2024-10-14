@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 
-import CardComponent from "~/components/Card";
-import { useTheme } from "~/components/Themed";
-import Typography from "~/components/Typography";
-import { Theme } from "~/constants/theme";
-import { Balances, Accounts } from "~/entities/types";
+import { Theme } from "~/shared/constants/theme";
+import { Account } from "~/entities/account";
+import CardComponent from "~/shared/components/Card";
+import { useTheme } from "~/shared/components/Themed";
+import Typography from "~/shared/components/Typography";
 
 interface Props {
-  accounts: Accounts;
-  balances: Balances;
+  accounts: Account[];
 }
 
 const sizes = {
@@ -17,14 +16,14 @@ const sizes = {
   height: 300,
 };
 
-export const Card: React.FC<Props> = ({ accounts, balances }) => {
+export const Card: React.FC<Props> = ({ accounts }) => {
   const [cardWidth, setCardWidth] = useState(0);
   const theme = useTheme();
   const styles = withTheme(theme, cardWidth);
 
   return (
     <View style={styles.root}>
-      {Object.values(accounts).map((account) => (
+      {accounts.map((account) => (
         <CardComponent style={styles.card}>
           <ImageBackground
             source={{
@@ -44,7 +43,7 @@ export const Card: React.FC<Props> = ({ accounts, balances }) => {
                 {account.name}
               </Typography>
               <Typography variant="text" color="white" style={styles.balance}>
-                {balances[account.id]} {account.currency}
+                {account.balance} {account.currency}
               </Typography>
             </View>
           </ImageBackground>
